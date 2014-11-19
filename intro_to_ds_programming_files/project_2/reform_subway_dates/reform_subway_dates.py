@@ -17,6 +17,7 @@ def reformat_subway_dates(date):
     http://docs.python.org/2/library/datetime.html#datetime.datetime.strptime
     '''
 
+
     date_formatted = date_formatted = datetime.strptime(date, "%m-%d-%y").strftime("%Y-%m-%d")
     return date_formatted
 
