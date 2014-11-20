@@ -22,17 +22,31 @@ def compute_cost(features, values, theta):
 
     return cost
 
+
 def gradient_descent(features, values, theta, alpha, num_iterations):
-     """
+    """
     Perform gradient descent given a data set with an arbitrary number of features.
     """
 
     # Write some code here that updates the values of theta a number of times equal to
-    # num_iterations.  Everytime you have computed the cost for a given set of thetas,
+    # num_iterations.  Every time you have computed the cost for a given set of thetas,
     # you should append it to cost_history.  The function should return both the final
     # values of theta and the cost history.
 
-    # YOUR CODE GOES HERE
+    cost_history = []
+    m = len(values)
+    for i in range(num_iterations):
+        # hypothesis/prediction = vector of theta_n x features_n
+        hypothesis = numpy.dot(features, theta)
+
+        # alpha divided by m, times vector of values - hypothesis x features, plus theta.
+        theta += (alpha / m) * numpy.dot(values - hypothesis, features)
+        #numpy.append(theta, theta_i)
+        # calculate cost and append to cost_history
+        cost_history.append(compute_cost(features, values, theta))
+
+
+    return theta, pandas.Series(cost_history)  # leave this line for the grader
 
 
 if __name__ == '__main__':
@@ -63,3 +77,12 @@ if __name__ == '__main__':
                                                             alpha, num_iterations)
 
     print "Theta =\n{theta}\n\nCost History = \n{history}".format(theta=theta_gradient_descent, history=cost_history)
+
+
+
+
+#http://docs.scipy.org/doc/numpy/reference/generated/numpy.append.html
+#http://aimotion.blogspot.com/2011/10/machine-learning-with-python-linear.html
+#http://stackoverflow.com/questions/17784587/gradient-descent-using-python-and-numpy
+#http://www.bogotobogo.com/python/python_numpy_batch_gradient_descent_algorithm.php
+

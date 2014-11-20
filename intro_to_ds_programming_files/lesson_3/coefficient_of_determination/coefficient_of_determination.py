@@ -13,6 +13,8 @@ def compute_r_squared(data, predictions):
 
     # YOUR CODE GOES HERE
 
+    # this code doesnt run here. but it does on the quiz.
+    r_squared = 1 - (np.power((data - predictions), 2)).sum() / (np.power((data - np.mean(data)), 2)).sum()
     return r_squared
 
 
