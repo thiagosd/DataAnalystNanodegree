@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import scipy
 
 def entries_histogram(turnstile_weather):
     '''
@@ -26,8 +27,9 @@ def entries_histogram(turnstile_weather):
     https://www.dropbox.com/s/meyki2wl9xfa7yk/turnstile_data_master_with_weather.csv
     '''
     plt.figure()
-    turnstile_weather['...'] # your code here to plot a historgram for hourly entries when it is raining
-    turnstile_weather['...'] # your code here to plot a historgram for hourly entries when it is not raining
+    turnstile_weather['ENTRIESn_hourly'][turnstile_weather['rain'] == 0].hist(color='b', label='No Rain').legend() # your code here to plot a historgram for hourly entries when it is not raining
+    turnstile_weather['ENTRIESn_hourly'][turnstile_weather['rain'] == 1].hist(color='g', label='Rain').legend() # your code here to plot a historgram for hourly entries when it is raining
+    #plt.show()
     return plt
 
 
@@ -36,3 +38,7 @@ if __name__ == "__main__":
     turnstile_weather = pd.read_csv("turnstile_data_master_with_weather.csv")
     plt = entries_histogram(turnstile_weather)
     plt.savefig(image)
+
+
+
+#http://matplotlib.org/examples/pylab_examples/histogram_demo_extended.html

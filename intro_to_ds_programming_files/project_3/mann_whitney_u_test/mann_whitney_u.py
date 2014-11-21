@@ -1,7 +1,7 @@
 import numpy as np
 import scipy
 import scipy.stats
-import pd
+import pandas as pd
 
 
 def mann_whitney_plus_means(turnstile_weather):
@@ -13,6 +13,14 @@ def mann_whitney_plus_means(turnstile_weather):
 
     http://docs.scipy.org/doc/numpy/reference/generated/numpy.mean.html
     '''
+
+    df_rain = turnstile_weather[turnstile_weather['rain'] == 1]
+    df_notrain = turnstile_weather[turnstile_weather['rain'] == 0]
+
+    with_rain_mean = np.mean(df_rain['ENTRIESn_hourly'])
+    without_rain_mean = np.mean(df_notrain['ENTRIESn_hourly'])
+
+    U, p = scipy.stats.mannwhitneyu(df_rain['ENTRIESn_hourly'], df_notrain['ENTRIESn_hourly'])
 
     return with_rain_mean, without_rain_mean, U, p
 
