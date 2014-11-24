@@ -13,13 +13,15 @@ def compute_r_squared(data, predictions):
     # that you might find useful, but you don't have to use them.
 
     # YOUR CODE GOES HERE
+    mean_data = np.mean(data)
+    r_squared = 1 - (np.sum((data - predictions)**2) / np.sum((data - mean_data)**2))
 
     return r_squared
 
 
 if __name__ == "__main__":
     input_filename = "turnstile_data_master_with_weather.csv"
-    turnstile_master = pd.read_csv(input_filename)
+    turnstile_master = pd.read_csv(input_filename, low_memory=False)
     predicted_values = predictions(turnstile_master)
     r_squared = compute_r_squared(turnstile_master['ENTRIESn_hourly'], predicted_values)
     print r_squared
