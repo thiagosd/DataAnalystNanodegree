@@ -16,9 +16,7 @@ def plot_residuals(dataframe, predictions):
     '''
 
     plt.figure()
-    #
-    # your code here
-    #
+    (dataframe['ENTRIESn_hourly'] - predictions).hist()
     return plt
 
 def normalize_features(array):
@@ -56,11 +54,11 @@ def gradient_descent(features, values, theta, alpha, num_iterations):
         cost = compute_cost(features, values, theta)
         cost_history.append(cost)
 
-    return theta, pandas.Series(cost_history)
+    return theta, pd.Series(cost_history)
 
 def predictions(dataframe):
 
-    dummy_units = pandas.get_dummies(dataframe['UNIT'], prefix='unit')
+    dummy_units = pd.get_dummies(dataframe['UNIT'], prefix='unit')
     features = dataframe[['rain', 'precipi', 'Hour', 'meantempi']].join(dummy_units)
     values = dataframe[['ENTRIESn_hourly']]
     m = len(values)
@@ -86,8 +84,13 @@ def predictions(dataframe):
 if __name__ == "__main__":
     input_filename = "turnstile_data_master_with_weather.csv"
     turnstile_master = pd.read_csv(input_filename)
+    #tp = pd.read_csv(input_filename, iterator=True, chunksize=1000, low_memory=False) # gives TextFileReader, which is iteratable with chunks of 1000 rows.
+    #turnstile_master = pd.concat(tp, ignore_index=True) # df is DataFrame. If error do list(tp)
     prediction_values = predictions(turnstile_master)
 
     image = "plot.png"
     plt = plot_residuals(turnstile_master, prediction_values)
     plt.savefig(image)
+
+# for memory error
+#http://stackoverflow.com/questions/24251219/low-memory-option-in-read-csv

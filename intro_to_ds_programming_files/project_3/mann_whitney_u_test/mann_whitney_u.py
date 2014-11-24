@@ -30,3 +30,8 @@ if __name__ == "__main__":
     student_output = mann_whitney_plus_means(turnstile_master)
 
     print student_output
+
+
+# links used for Project 3 - (Task: 4 - Ridership on Rainy vs. Nonrainy Days)
+#https://explorable.com/mann-whitney-u-test
+#http://graphpad.com/guides/prism/6/statistics/index.htm?how_the_mann-whitney_test_works.htm
