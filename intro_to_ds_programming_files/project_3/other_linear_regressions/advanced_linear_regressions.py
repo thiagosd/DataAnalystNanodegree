@@ -6,14 +6,14 @@ import statsmodels.api as sm
 
 
 def normalize_features(array):
-   """
+    """
    Normalize the features in our data set.
    """
-   array_normalized = (array-array.mean())/array.std()
-   mu = array.mean()
-   sigma = array.std()
+    array_normalized = (array - array.mean()) / array.std()
+    mu = array.mean()
+    sigma = array.std()
 
-   return array_normalized, mu, sigma
+    return array_normalized, mu, sigma
 
 
 """
@@ -42,48 +42,67 @@ the 30 second limit that's placed on running your program. See if you can optimi
 runs faster.
 """
 
+
 def predictions(weather_turnstile):
     #
     # Your implementation goes here. Feel free to write additional
     # helper functions
     #
 
-    #weather_turnstile.dropna(inplace=True)
+    # add day of week to the dataframe
+    weather_turnstile['weekday'] = pd.DatetimeIndex(weather_turnstile['DATEn']).weekday
+
+    # drop bad data
     weather_turnstile = weather_turnstile.dropna()
 
+    # add Units as dummy values because it is type Category
     dummy_units = pd.get_dummies(weather_turnstile['UNIT'], prefix='unit')
-    features = weather_turnstile[['rain', 'precipi', 'Hour', 'meantempi']].join(dummy_units)
+
+    dummy_weekday = pd.get_dummies(weather_turnstile['weekday'], prefix='weekday')
+
+    features = weather_turnstile[['rain', 'precipi', 'Hour', 'meantempi', 'meanwindspdi', 'weekday']].join(dummy_units)
+    features = features.join(dummy_weekday)
+
     values = weather_turnstile[['ENTRIESn_hourly']]
     m = len(values)
 
     # normalize features
     features, mu, sigma = normalize_features(features)
-    features['ones'] = np.ones(m) # add column to interception
-    #print features
+    features['ones'] = np.ones(m)  # add column to interception
+
     model = sm.OLS(values, features)
     results = model.fit()
-    #prediction = np.dot(features, results.params)
-    prediction = results.predict()
 
-    return prediction
+    #prediction = np.dot(features, results.params)  # use results.predict() instead
+    #prediction = results.predict()
 
+    #return prediction
+    return results
+
+'''
 def compute_r_squared(data, predictions):
-    SST = ((data-np.mean(data))**2).sum()
-    SSReg = ((predictions-np.mean(data))**2).sum()
+    SST = ((data - np.mean(data)) ** 2).sum()
+    SSReg = ((predictions - np.mean(data)) ** 2).sum()
     r_squared = SSReg / SST
 
     return r_squared
+'''
 
 if __name__ == "__main__":
     input_filename = "turnstile_data_master_with_weather_smaller.csv"
     turnstile_master = pd.read_csv(input_filename, low_memory=False)
-    predicted_values = predictions(turnstile_master)
-    r_squared = compute_r_squared(turnstile_master['ENTRIESn_hourly'], predicted_values)
+    #predicted_values = predictions(turnstile_master)
+    results = predictions(turnstile_master)
+    #r_squared = compute_r_squared(turnstile_master['ENTRIESn_hourly'], predicted_values)  # OLS calcuates r_squared automatically
+    r_squared = results.rsquared
 
     print r_squared
 
 
-#http://stackoverflow.com/questions/21827594/raise-linalgerrorsvd-did-not-converge-linalgerror-svd-did-not-converge-in-m
-#http://pandas.pydata.org/pandas-docs/dev/generated/pandas.DataFrame.dropna.html
-#http://stackoverflow.com/questions/13218461/predicting-values-using-an-ols-model-with-statsmodels
-#https://github.com/statsmodels/statsmodels/blob/master/examples/python/ols.py
+    # http://stackoverflow.com/questions/21827594/raise-linalgerrorsvd-did-not-converge-linalgerror-svd-did-not-converge-in-m
+    #http://pandas.pydata.org/pandas-docs/dev/generated/pandas.DataFrame.dropna.html
+    #http://stackoverflow.com/questions/13218461/predicting-values-using-an-ols-model-with-statsmodels
+    #https://github.com/statsmodels/statsmodels/blob/master/examples/python/ols.py
+    #http://statsmodels.sourceforge.net/stable/generated/statsmodels.regression.linear_model.RegressionResults.predict.html
+    #http://pandas-docs.github.io/pandas-docs-travis/timeseries.html
+    #http://pandas.pydata.org/pandas-docs/stable/indexing.html#indexing-view-versus-copy
