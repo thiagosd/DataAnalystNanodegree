@@ -50,6 +50,7 @@ def predictions(weather_turnstile):
     #
 
     # add day of week to the dataframe
+    weather_turnstile = weather_turnstile.copy()
     weather_turnstile['weekday'] = pd.DatetimeIndex(weather_turnstile['DATEn']).weekday
 
     # drop bad data
@@ -60,7 +61,8 @@ def predictions(weather_turnstile):
 
     dummy_weekday = pd.get_dummies(weather_turnstile['weekday'], prefix='weekday')
 
-    features = weather_turnstile[['rain', 'precipi', 'Hour', 'meantempi', 'meanwindspdi', 'weekday']].join(dummy_units)
+    features = weather_turnstile[
+        ['rain', 'precipi', 'Hour', 'meantempi', 'meanwindspdi', 'weekday', 'EXITSn_hourly']].join(dummy_units)
     features = features.join(dummy_weekday)
 
     values = weather_turnstile[['ENTRIESn_hourly']]
@@ -73,11 +75,12 @@ def predictions(weather_turnstile):
     model = sm.OLS(values, features)
     results = model.fit()
 
-    #prediction = np.dot(features, results.params)  # use results.predict() instead
+    # prediction = np.dot(features, results.params)  # use results.predict() instead
     #prediction = results.predict()
 
     #return prediction
     return results
+
 
 '''
 def compute_r_squared(data, predictions):
@@ -91,7 +94,7 @@ def compute_r_squared(data, predictions):
 if __name__ == "__main__":
     input_filename = "turnstile_data_master_with_weather_smaller.csv"
     turnstile_master = pd.read_csv(input_filename, low_memory=False)
-    #predicted_values = predictions(turnstile_master)
+    # predicted_values = predictions(turnstile_master)
     results = predictions(turnstile_master)
     #r_squared = compute_r_squared(turnstile_master['ENTRIESn_hourly'], predicted_values)  # OLS calcuates r_squared automatically
     r_squared = results.rsquared
