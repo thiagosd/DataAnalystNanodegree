@@ -1,8 +1,6 @@
 import numpy as np
 import pandas as pd
-import scipy
-import statsmodels
-import statsmodels.api as sm
+import statsmodels.formula.api as sm
 
 
 def normalize_features(array):
@@ -49,12 +47,17 @@ def predictions(weather_turnstile):
     # helper functions
     #
 
-    # add day of week to the dataframe
+    # copy() to avoid error
     weather_turnstile = weather_turnstile.copy()
+
+    # add day of week to the dataframe
     weather_turnstile['weekday'] = pd.DatetimeIndex(weather_turnstile['DATEn']).weekday
 
     # drop bad data
     weather_turnstile = weather_turnstile.dropna()
+
+    '''
+    # UPDATE: comment this block out because now using polynomial regression. see OLS() call below
 
     # add Units as dummy values because it is type Category
     dummy_units = pd.get_dummies(weather_turnstile['UNIT'], prefix='unit')
@@ -62,7 +65,7 @@ def predictions(weather_turnstile):
     dummy_weekday = pd.get_dummies(weather_turnstile['weekday'], prefix='weekday')
 
     features = weather_turnstile[
-        ['rain', 'precipi', 'Hour', 'meantempi', 'meanwindspdi', 'weekday', 'EXITSn_hourly']].join(dummy_units)
+        ['rain', 'precipi', 'Hour', 'meantempi', 'meanwindspdi', 'weekday']]#.join(dummy_units)
     features = features.join(dummy_weekday)
 
     values = weather_turnstile[['ENTRIESn_hourly']]
@@ -71,8 +74,16 @@ def predictions(weather_turnstile):
     # normalize features
     features, mu, sigma = normalize_features(features)
     features['ones'] = np.ones(m)  # add column to interception
+    #model = sm.OLS(values, features)
+    '''
 
-    model = sm.OLS(values, features)
+    # using polynomial as suggested by Instructor Sheng Kung Yi here: https://piazza.com/class/i23uptiifb6194?cid=236
+    # poly n=3
+    # also, not using EXITSn_hourly, as suggested by Carl Ward here: https://piazza.com/class/i23uptiifb6194?cid=257
+    model = sm.ols(
+        formula="ENTRIESn_hourly ~ rain + precipi + meantempi + meanwindspdi + weekday + fog + UNIT \
+            + Hour + I(Hour ** 2.0) + I(Hour ** 3.0)",
+        data=weather_turnstile)
     results = model.fit()
 
     # prediction = np.dot(features, results.params)  # use results.predict() instead
@@ -96,7 +107,7 @@ if __name__ == "__main__":
     turnstile_master = pd.read_csv(input_filename, low_memory=False)
     # predicted_values = predictions(turnstile_master)
     results = predictions(turnstile_master)
-    #r_squared = compute_r_squared(turnstile_master['ENTRIESn_hourly'], predicted_values)  # OLS calcuates r_squared automatically
+    # r_squared = compute_r_squared(turnstile_master['ENTRIESn_hourly'], predicted_values)  # OLS calcuates r_squared automatically
     r_squared = results.rsquared
 
     print r_squared
