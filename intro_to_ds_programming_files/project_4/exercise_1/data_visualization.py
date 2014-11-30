@@ -29,7 +29,7 @@ def plot_weather_data(turnstile_weather):
     of the actual data in the turnstile_weather dataframe
     '''
 
-    plot = # your code here
+    plot = '' # your code here
     return plot
 
 
