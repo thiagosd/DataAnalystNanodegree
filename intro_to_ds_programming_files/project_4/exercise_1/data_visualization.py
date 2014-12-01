@@ -1,5 +1,7 @@
-from pandas import *
+import pandas as pd
+import numpy as np
 from ggplot import *
+
 
 def plot_weather_data(turnstile_weather):
     '''
@@ -29,14 +31,53 @@ def plot_weather_data(turnstile_weather):
     of the actual data in the turnstile_weather dataframe
     '''
 
-    plot = '' # your code here
-    return plot
+    # - Ridership by time of day or day of week
+
+    # plot = ggplot(turnstile_weather, aes('Hour', 'ENTRIESn_hourly')) + geom_bar(stat='bar', color='green') + ggtitle(
+    # '# of Entries by Hour') + xlab('Hour') + ylab('# of Entries')
+
+    # return plot
+
+
+    '''
+    # - Ridership by day of week
+
+    turnstile_weather = turnstile_weather.copy()
+    # add day of week to the dataframe
+    turnstile_weather['weekday'] = pd.DatetimeIndex(turnstile_weather['DATEn']).weekday
+
+    weekday_and_averageentries = turnstile_weather.groupby('weekday', as_index=False).ENTRIESn_hourly.mean()
+    weekday_and_averageentries.rename(columns={'ENTRIESn_hourly': 'avg_ENTRIESn_hourly'}, inplace=True)
+
+    plot2 = ggplot(weekday_and_averageentries, aes('weekday', 'avg_ENTRIESn_hourly')) + geom_bar(stat='bar',
+                                                                                                 color='green') + ggtitle(
+        'avg # of Entries by Day of Week') + xlab('Day of Week') + ylab('avg # of Entries')  #+ scale_x_discrete(
+    #labels=["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"])
+
+    #return plot2
+    '''
+
+
+
+    # - Which stations have more exits or entries at different times of day
+    turnstile_weather = turnstile_weather.copy()
+    # add day of week to the dataframe
+    # turnstile_weather['weekday'] = pd.DatetimeIndex(turnstile_weather['DATEn']).weekday
+
+    hour_and_averageentries = turnstile_weather.groupby(['UNIT', 'Hour'], as_index=False).ENTRIESn_hourly.mean()
+    hour_and_averageentries.rename(columns={'ENTRIESn_hourly': 'avg_ENTRIESn_hourly'}, inplace=True)
+
+    plot3 = ggplot(hour_and_averageentries, aes(x='Hour')) + geom_dotplot() + facet_grid('UNIT', 'avg_ENTRIESn_hourly') + ggtitle(
+        'avg # of Entries by Hour') + xlab('Hour') + ylab('avg # of Entries')
+
+    return plot3
 
 
 if __name__ == "__main__":
     image = "plot.png"
-    with open(image, "wb") as f:
-        turnstile_weather = pd.read_csv(input_filename)
-        turnstile_weather['datetime'] = turnstile_weather['DATEn'] + ' ' + turnstile_weather['TIMEn']
-        gg =  plot_weather_data(turnstile_weather)
-        ggsave(f, gg)
+    # with open(image, "wb") as f:
+    turnstile_weather = pd.read_csv("turnstile_data_master_with_weather.csv")
+    turnstile_weather['datetime'] = turnstile_weather['DATEn'] + ' ' + turnstile_weather['TIMEn']
+    gg = plot_weather_data(turnstile_weather)
+    # ggsave(f, gg)
+    ggsave(image, gg, width=11, height=8)
