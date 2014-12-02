@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from ggplot import *
 
 
@@ -39,7 +38,6 @@ def plot_weather_data(turnstile_weather):
     # return plot
 
 
-    '''
     # - Ridership by day of week
 
     turnstile_weather = turnstile_weather.copy()
@@ -50,27 +48,11 @@ def plot_weather_data(turnstile_weather):
     weekday_and_averageentries.rename(columns={'ENTRIESn_hourly': 'avg_ENTRIESn_hourly'}, inplace=True)
 
     plot2 = ggplot(weekday_and_averageentries, aes('weekday', 'avg_ENTRIESn_hourly')) + geom_bar(stat='bar',
-                                                                                                 color='green') + ggtitle(
-        'avg # of Entries by Day of Week') + xlab('Day of Week') + ylab('avg # of Entries')  #+ scale_x_discrete(
-    #labels=["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"])
+                                                                                                 color='yellow') + ggtitle(
+        'avg # of Entries by Day of Week') + xlab('Day of Week') + ylab('avg # of Entries') + scale_x_discrete(
+        limits=(-1, 7), breaks=range(0, 7, 1), labels=["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"])
 
-    #return plot2
-    '''
-
-
-
-    # - Which stations have more exits or entries at different times of day
-    turnstile_weather = turnstile_weather.copy()
-    # add day of week to the dataframe
-    # turnstile_weather['weekday'] = pd.DatetimeIndex(turnstile_weather['DATEn']).weekday
-
-    hour_and_averageentries = turnstile_weather.groupby(['UNIT', 'Hour'], as_index=False).ENTRIESn_hourly.mean()
-    hour_and_averageentries.rename(columns={'ENTRIESn_hourly': 'avg_ENTRIESn_hourly'}, inplace=True)
-
-    plot3 = ggplot(hour_and_averageentries, aes(x='Hour')) + geom_dotplot() + facet_grid('UNIT', 'avg_ENTRIESn_hourly') + ggtitle(
-        'avg # of Entries by Hour') + xlab('Hour') + ylab('avg # of Entries')
-
-    return plot3
+    return plot2
 
 
 if __name__ == "__main__":
@@ -81,3 +63,7 @@ if __name__ == "__main__":
     gg = plot_weather_data(turnstile_weather)
     # ggsave(f, gg)
     ggsave(image, gg, width=11, height=8)
+
+
+
+# http://stackoverflow.com/questions/15705630/python-how-can-i-get-the-row-which-has-the-max-value-in-goups-making-groupby
