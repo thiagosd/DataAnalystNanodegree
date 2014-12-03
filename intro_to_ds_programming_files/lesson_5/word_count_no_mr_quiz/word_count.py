@@ -36,7 +36,7 @@ def word_count():
         for word in data:
             clean_word = word.translate(string.maketrans("", ""), string.punctuation).lower()
 
-            if clean_word in word_counts:
+            if clean_word in word_counts.keys():
                 word_counts[clean_word] += 1
             else:
                 word_counts[clean_word] = 1
