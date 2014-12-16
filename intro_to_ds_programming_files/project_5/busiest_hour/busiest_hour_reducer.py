@@ -1,7 +1,9 @@
 import sys
+import time
+
 
 def reducer():
-'''
+    '''
     Write a reducer that will compute the busiest date and time (that is, the
     date and time with the most entries) for each turnstile unit. Ties should
     be broken in favor of datetimes that are later on in the month of May. You
@@ -37,7 +39,43 @@ def reducer():
     old_key = None
     datetime = ''
 
-    for line in sys.stdin:
-        # your code here
-    
+    text_file = open("output.txt", "r")
+    lines = text_file.readlines()
+
+    for line in lines:
+        data = line.strip().split("\t")
+
+        # each line must have 4 elements
+        if len(data) != 4:
+            continue
+
+        # we have a new key. reset the counter.
+        # set max_entries with first value of ENTRIESn_hourly on the new turnstile unit
+        if old_key and old_key != data[0]:
+            print "{0}\t{1}\t{2}".format(old_key, datetime, max_entries)
+            max_entries = 0
+            # datetime = time.strptime("{0} {1}".format(data[2], data[3]), "%Y-%m-%d %H:%M:%S") not needed.
+
+        # same key.
+        # if new ENTRIESn_hourly is equal to old ENTRIESn_hourly,
+        #   set max_entries and datetime based on the latest datetime
+        # if new ENTRIESn_hourly is greater than ENTRIESn_hourly, set max_entries and datetime
+        if float(data[1]) == max_entries:
+            if "{0} {1}".format(data[2], data[3]) > datetime:
+                max_entries = float(data[1])
+                datetime = "{0} {1}".format(data[2], data[3])
+        elif float(data[1]) > max_entries:
+            max_entries = float(data[1])
+            datetime = "{0} {1}".format(data[2], data[3])
+        old_key = data[0]
+
+    # print value for last key
+    if old_key is not None:
+        print "{0}\t{1}\t{2}".format(old_key, datetime, max_entries)
+
+
 reducer()
+
+
+
+#https://docs.python.org/2/library/time.html#time.strptime

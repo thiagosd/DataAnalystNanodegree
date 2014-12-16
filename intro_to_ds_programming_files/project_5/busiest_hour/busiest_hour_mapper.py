@@ -22,8 +22,25 @@ def mapper():
     logging.info("My debugging message")
     """
 
-    for line in sys.stdin:
+    # write to csv file, that will be used by the reducer
+    output_file = open("output.txt", "wb")
 
-# your code here
+    text_file = open("turnstile_data_master_with_weather.csv", "r")
+    rows = text_file.readlines()[1:]  # readlines and skip the header (1st line)
+    for row in rows:
+        data = row.strip().split(",")
+
+        # csv file has 22 header columns
+        # we only want rows with values in all header columns
+        if len(data) != 22:
+            continue
+
+        # print key-value pair
+        # index 1 = UNIT
+        # index 2 = DATEn
+        # index 3 = TIMEn
+        # index 6 = ENTRIESn_hourly
+        print "{0}\t{1}\t{2}\t{3}".format(data[1], data[6], data[2], data[3])
+        output_file.write("{0}\t{1}\t{2}\t{3}".format(data[1], data[6], data[2], data[3]) + "\n")
 
 mapper()
