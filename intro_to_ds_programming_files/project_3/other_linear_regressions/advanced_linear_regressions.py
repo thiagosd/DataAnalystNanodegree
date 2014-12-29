@@ -86,8 +86,15 @@ def predictions(weather_turnstile):
         data=weather_turnstile)
     results = model.fit()
 
+    '''
+    # plot residuals
     # prediction = np.dot(features, results.params)  # use results.predict() instead
-    #prediction = results.predict()
+    prediction = results.predict()
+    import matplotlib.pyplot as plt
+    plt.figure()
+    (weather_turnstile['ENTRIESn_hourly'] - prediction).hist()
+    plt.show()
+    '''
 
     #return prediction
     return results
@@ -120,3 +127,4 @@ if __name__ == "__main__":
     #http://statsmodels.sourceforge.net/stable/generated/statsmodels.regression.linear_model.RegressionResults.predict.html
     #http://pandas-docs.github.io/pandas-docs-travis/timeseries.html
     #http://pandas.pydata.org/pandas-docs/stable/indexing.html#indexing-view-versus-copy
+    #http://nbviewer.ipython.org/urls/s3.amazonaws.com/datarobotblog/notebooks/multiple_regression_in_python.ipynb
