@@ -23,8 +23,20 @@ DATAFILE = "745090.csv"
 def parse_file(datafile):
     name = ""
     data = []
-    with open(datafile,'rb') as f:
-        pass
+    with open(datafile, 'rb') as f:
+        # skip first row. it contains document metadata
+        meta = next(f)
+        meta = meta.split(',')
+        name = meta[1].strip('"')
+        # skip header
+        next(f)
+        # counter = 0
+        reader = csv.reader(f)
+        #for row in reader:
+        #    data.insert(counter, row)
+        #    counter += 1
+        # replace commented out code above with 'list-comprehensions'. 'List comprehensions provide a concise way to create lists'
+        data = [row for row in reader]
     # Do not change the line below
     return (name, data)
 
@@ -41,3 +53,6 @@ def test():
 
 if __name__ == "__main__":
     test()
+
+
+    # https://docs.python.org/2/tutorial/datastructures.html#list-comprehensions
