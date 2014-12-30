@@ -15,9 +15,21 @@ DATAFILE = "beatles-diskography.csv"
 
 def parse_file(datafile):
     data = []
+    i = 0
     with open(datafile, "rb") as f:
+        header = f.readline()
+        header_dic = header.split(',')
+
         for line in f:
-            print line
+            line = line.split(',')
+            line_dict = {}
+            for j in range(len(line)):
+                line_dict.update({header_dic[j].strip(): line[j].strip()})
+                data.insert(i, line_dict)
+
+            if i == 9:
+                break
+            i += 1
 
     return data
 
@@ -26,11 +38,14 @@ def test():
     # a simple test of your implemetation
     datafile = os.path.join(DATADIR, DATAFILE)
     d = parse_file(datafile)
-    firstline = {'Title': 'Please Please Me', 'UK Chart Position': '1', 'Label': 'Parlophone(UK)', 'Released': '22 March 1963', 'US Chart Position': '-', 'RIAA Certification': 'Platinum', 'BPI Certification': 'Gold'}
-    tenthline = {'Title': '', 'UK Chart Position': '1', 'Label': 'Parlophone(UK)', 'Released': '10 July 1964', 'US Chart Position': '-', 'RIAA Certification': '', 'BPI Certification': 'Gold'}
+    firstline = {'Title': 'Please Please Me', 'UK Chart Position': '1', 'Label': 'Parlophone(UK)',
+                 'Released': '22 March 1963', 'US Chart Position': '-', 'RIAA Certification': 'Platinum',
+                 'BPI Certification': 'Gold'}
+    tenthline = {'Title': '', 'UK Chart Position': '1', 'Label': 'Parlophone(UK)', 'Released': '10 July 1964',
+                 'US Chart Position': '-', 'RIAA Certification': '', 'BPI Certification': 'Gold'}
 
     assert d[0] == firstline
     assert d[9] == tenthline
 
-    
+
 test()
