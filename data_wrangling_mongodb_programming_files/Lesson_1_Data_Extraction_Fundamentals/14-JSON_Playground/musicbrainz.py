@@ -8,10 +8,10 @@ import requests
 BASE_URL = "http://musicbrainz.org/ws/2/"
 ARTIST_URL = BASE_URL + "artist/"
 
-query_type = {  "simple": {},
-                "atr": {"inc": "aliases+tags+ratings"},
-                "aliases": {"inc": "aliases"},
-                "releases": {"inc": "releases"}}
+query_type = {"simple": {},
+              "atr": {"inc": "aliases+tags+ratings"},
+              "aliases": {"inc": "aliases"},
+              "releases": {"inc": "releases"}}
 
 
 def query_site(url, params, uid="", fmt="json"):
@@ -38,7 +38,7 @@ def pretty_print(data, indent=4):
 
 
 def main():
-    results = query_by_name(ARTIST_URL, query_type["simple"], "Nirvana")
+    results = query_by_name(ARTIST_URL, query_type["simple"], "FIRST AID KIT")
     pretty_print(results)
 
     artist_id = results["artists"][1]["id"]
