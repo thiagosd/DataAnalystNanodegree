@@ -24,8 +24,8 @@ import requests
 
 URL_MAIN = "http://api.nytimes.com/svc/"
 URL_POPULAR = URL_MAIN + "mostpopular/v2/"
-API_KEY = { "popular": "",
-            "article": ""}
+API_KEY = {"popular": "",
+           "article": ""}
 
 
 def get_from_file(kind, period):
@@ -37,9 +37,14 @@ def get_from_file(kind, period):
 def article_overview(kind, period):
     data = get_from_file(kind, period)
     titles = []
-    urls =[]
+    urls = []
     # YOUR CODE HERE
-
+    for article in data:
+        titles.append({article['section']: article['title']})
+        for articlemetadata in article['media']:
+            for articleformat in articlemetadata['media-metadata']:
+                if articleformat['format'] == "Standard Thumbnail":
+                    urls.append(articleformat['url'])
     return (titles, urls)
 
 
@@ -53,7 +58,7 @@ def query_site(url, target, offset):
         print "See Intructor notes for information"
         return False
     params = {"api-key": API_KEY[target], "offset": offset}
-    r = requests.get(url, params = params)
+    r = requests.get(url, params=params)
 
     if r.status_code == requests.codes.ok:
         return r.json()
@@ -64,7 +69,7 @@ def query_site(url, target, offset):
 def get_popular(url, kind, days, section="all-sections", offset=0):
     # This function will construct the query according to the requirements of the site
     # and return the data, or print an error message if called incorrectly
-    if days not in [1,7,30]:
+    if days not in [1, 7, 30]:
         print "Time period can be 1,7, 30 days only"
         return False
     if kind not in ["viewed", "shared", "emailed"]:
@@ -84,10 +89,10 @@ def save_file(kind, period):
     num_results = data["num_results"]
     full_data = []
     with codecs.open("popular-{0}-{1}-full.json".format(kind, period), encoding='utf-8', mode='w') as v:
-        for offset in range(0, num_results, 20):        
+        for offset in range(0, num_results, 20):
             data = get_popular(URL_POPULAR, kind, period, offset=offset)
             full_data += data["results"]
-        
+
         v.write(json.dumps(full_data, indent=2))
 
 
