@@ -26,10 +26,17 @@ def extract_data(page):
 
 
 def make_request(data):
-    eventvalidation = data["eventvalidation"]
-    viewstate = data["viewstate"]
+    #eventvalidation = data["eventvalidation"]
+    #viewstate = data["viewstate"]
 
-    r = requests.post("http://www.transtats.bts.gov/Data_Elements.aspx?Data=2",
+    s = requests.Session()
+    r = s.get("http://transtats.bts.gov/Data_Elements.aspx?Data=2")
+    soup = BeautifulSoup(r.text)
+    viewstate_element = soup.find(id="__VIEWSTATE")
+    viewstate = viewstate_element["value"]
+    eventvalidation_element = soup.find(id="__EVENTVALIDATION")
+    eventvalidation = eventvalidation_element["value"]
+    r = s.post("http://www.transtats.bts.gov/Data_Elements.aspx?Data=2",
                     data={'AirportList': "BOS",
                           'CarrierList': "VX",
                           'Submit': 'Submit',
@@ -39,8 +46,8 @@ def make_request(data):
                           "__VIEWSTATE": viewstate
                     })
 
-    #f = open("virgin_and_logan_airport.html", "w")
-    #f.write(r.text)
+    f = open("virgin_and_logan_airport.html", "w")
+    f.write(r.text)
     return r.text
 
 
@@ -50,7 +57,10 @@ def test():
     assert data["eventvalidation"].startswith("/wEWjAkCoIj1ng0")
     assert data["viewstate"].startswith("/wEPDwUKLTI")
 
-    #make_request(data)
+    make_request(data)
 
     
 test()
+
+
+#http://www.crummy.com/software/BeautifulSoup/bs4/doc/
