@@ -15,8 +15,12 @@ def extract_data(page):
     data = {"eventvalidation": "",
             "viewstate": ""}
     with open(page, "r") as html:
-        # do something here to find the necessary values
-        pass
+        soup = BeautifulSoup(html)
+        ev = soup.find(id="__EVENTVALIDATION")
+        data["eventvalidation"] = ev["value"]
+
+        vs = soup.find(id="__VIEWSTATE")
+        data["viewstate"] = vs["value"]
 
     return data
 
@@ -35,6 +39,8 @@ def make_request(data):
                           "__VIEWSTATE": viewstate
                     })
 
+    #f = open("virgin_and_logan_airport.html", "w")
+    #f.write(r.text)
     return r.text
 
 
@@ -43,6 +49,8 @@ def test():
     assert data["eventvalidation"] != ""
     assert data["eventvalidation"].startswith("/wEWjAkCoIj1ng0")
     assert data["viewstate"].startswith("/wEPDwUKLTI")
+
+    #make_request(data)
 
     
 test()

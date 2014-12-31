@@ -16,15 +16,18 @@ def get_root(fname):
 
 def get_authors(root):
     authors = []
+    data = {
+            "fnm": None,
+            "snm": None,
+            "email": None
+    }
+    # YOUR CODE HERE
     for author in root.findall('./fm/bibl/aug/au'):
         data = {
-                "fnm": None,
-                "snm": None,
-                "email": None
+            "fnm": author.find('fnm').text,
+            "snm": author.find('snm').text,
+            "email": author.find('email').text
         }
-
-        # YOUR CODE HERE
-
         authors.append(data)
 
     return authors
@@ -41,3 +44,6 @@ def test():
 
 
 test()
+
+
+#https://docs.python.org/3/library/xml.etree.elementtree.html#xml.etree.ElementTree.Element.find

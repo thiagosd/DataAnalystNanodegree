@@ -26,9 +26,15 @@ def get_authors(root):
         }
 
         # YOUR CODE HERE
-
-        authors.append(data)
-
+        for author in root.findall('./fm/bibl/aug/au'):
+            data = {
+                "fnm": author.find('fnm').text,
+                "snm": author.find('snm').text,
+                "email": author.find('email').text,
+                # using 'List Comprehensions'. https://docs.python.org/2/tutorial/datastructures.html#list-comprehensions
+                "insr": [x.attrib["iid"] for x in author.findall('insr')]
+            }
+            authors.append(data)
     return authors
 
 
@@ -50,3 +56,6 @@ def test():
 
 
 test()
+
+
+#https://docs.python.org/2/tutorial/datastructures.html#list-comprehensions
