@@ -12,7 +12,8 @@ def extract_airports(page):
     with open(page, "r") as html:
         # do something here to find the necessary values
         soup = BeautifulSoup(html)
-
+        data = [str(option["value"]) for option in soup.find(id="AirportList").find_all('option') if
+                not str(option["value"]).startswith("All")]
     return data
 
 

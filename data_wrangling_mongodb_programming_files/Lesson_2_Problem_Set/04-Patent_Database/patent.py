@@ -6,7 +6,7 @@
 # The data itself is in XML, however there is a problem with how it's formatted.
 # Please run this script and observe the error. Then find the line that is causing the error.
 # You can do that by just looking at the datafile in the web UI, or programmatically.
-# For quiz purpose it does not matter, but as an exercise we suggest that you try to do it programmatically.
+# For quiz purposes it does not matter, but as an exercise we suggest that you try to do it programmatically.
 # The original file is ~600MB large, you might not be able to open it in a text editor.
 
 import xml.etree.ElementTree as ET
