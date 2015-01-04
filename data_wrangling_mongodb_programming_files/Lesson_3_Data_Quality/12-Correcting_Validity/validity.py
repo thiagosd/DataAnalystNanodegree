@@ -23,29 +23,47 @@ INPUT_FILE = 'autos.csv'
 OUTPUT_GOOD = 'autos-valid.csv'
 OUTPUT_BAD = 'FIXME-autos.csv'
 
-def process_file(input_file, output_good, output_bad):
 
+def process_file(input_file, output_good, output_bad):
     with open(input_file, "r") as f:
         reader = csv.DictReader(f)
         header = reader.fieldnames
 
-        #COMPLETE THIS FUNCTION
+        # COMPLETE THIS FUNCTION
+        startYear = 'productionStartYear'
+        ob = open(output_bad, 'w')
+        og = open(output_good, 'w')
+        good_writer = csv.DictWriter(og, delimiter=',', fieldnames=header)
+        bad_writer = csv.DictWriter(ob, delimiter=',', fieldnames=header)
+        good_writer.writeheader()
+        bad_writer.writeheader()
 
+        for row in reader:
+            if not row["URI"].startswith("http://dbpedia.org"):
+                continue
+            date_string = row[startYear]
 
+            try:
+                date_string = int(date_string[:4])
+            except ValueError:
+                date_string = None
 
-    # This is just an example on how you can use csv.DictWriter
-    # Remember that you have to output 2 files
-    with open(output_good, "w") as g:
-        writer = csv.DictWriter(g, delimiter=",", fieldnames= header)
-        writer.writeheader()
-        for row in YOURDATA:
-            writer.writerow(row)
+            if date_string and date_string > 1885 and date_string < 2015:
+                row[startYear] = date_string
+                good_writer.writerow(row)
+            else:
+                bad_writer.writerow(row)
+
+        ob.close()
+        og.close()
 
 
 def test():
-
     process_file(INPUT_FILE, OUTPUT_GOOD, OUTPUT_BAD)
 
 
 if __name__ == "__main__":
     test()
+
+
+# didnt want to work on this quiz. code copied from https://piazza.com/class/i23uptiifb6194?cid=451
