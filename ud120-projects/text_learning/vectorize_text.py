@@ -7,6 +7,7 @@ import os
 # import nltk
 #from nltk.corpus import stopwords
 
+
 sys.path.append("../tools/")
 from parse_out_email_text import parseOutText
 
@@ -43,28 +44,29 @@ for name, from_person in [("sara", from_sara), ("chris", from_chris)]:
         ### only look at first 200 emails when developing
         ### once everything is working, remove this line to run over full dataset
         temp_counter += 1
-        if temp_counter < 200:
-            #path = os.path.join('..', 'tools', path[:-1])
-            path = os.path.join('..', path[:-1])
-            email = open(path, "r")
+        #if temp_counter < 200:
 
-            ### use parseOutText to extract the text from the opened email
-            parsed_email = parseOutText(email)
+        #path = os.path.join('..', 'tools', path[:-1])
+        path = os.path.join('..', path[:-1])
+        email = open(path, "r")
 
-            ### use str.replace() to remove any instances of the words
-            ### ["sara", "shackleton", "chris", "germani"]
-            parsed_email = parsed_email.replace("sara", "").replace("shackleton", "").replace("chris", "").replace(
-                "germani", "")
-            ### append the text to word_data
-            word_data.append(parsed_email)
-            ### append a 0 to from_data if email is from Sara, and 1 if email is from Chris
-            if name == 'sara':
-                from_data.append(0)
-            elif name == 'chris':
-                from_data.append(1)
+        ### use parseOutText to extract the text from the opened email
+        parsed_email = parseOutText(email)
 
-            email.close()
-print word_data[152]
+        ### use str.replace() to remove any instances of the words
+        ### ["sara", "shackleton", "chris", "germani"]
+        parsed_email = parsed_email.replace("sara", "").replace("shackleton", "").replace("chris", "").replace(
+            "germani", "")
+        ### append the text to word_data
+        word_data.append(parsed_email)
+        ### append a 0 to from_data if email is from Sara, and 1 if email is from Chris
+        if name == 'sara':
+            from_data.append(0)
+        elif name == 'chris':
+            from_data.append(1)
+
+        email.close()
+#print word_data[152]
 print "emails processed"
 from_sara.close()
 from_chris.close()
@@ -72,10 +74,17 @@ from_chris.close()
 pickle.dump(word_data, open("your_word_data.pkl", "w"))
 pickle.dump(from_data, open("your_email_authors.pkl", "w"))
 
-
-
-
-
 ### in Part 4, do TfIdf vectorization here
+from sklearn.feature_extraction.text import TfidfVectorizer
+#rom nltk.corpus import stopwords
 
+#sw = stopwords.words("english")
+
+vectorizer = TfidfVectorizer(stop_words='english')
+X = vectorizer.fit_transform(word_data)
+idf = vectorizer._tfidf.idf_
+print idf
+vocab_list = vectorizer.get_feature_names()
+print vocab_list[34597]
+#print dict(zip(vectorizer.get_feature_names(), idf))
 
