@@ -56,7 +56,7 @@ for name, from_person in [("sara", from_sara), ("chris", from_chris)]:
         ### use str.replace() to remove any instances of the words
         ### ["sara", "shackleton", "chris", "germani"]
         parsed_email = parsed_email.replace("sara", "").replace("shackleton", "").replace("chris", "").replace(
-            "germani", "")
+            "germani", "").replace("sshacklensf", "").replace("cgermannsf", "")
         ### append the text to word_data
         word_data.append(parsed_email)
         ### append a 0 to from_data if email is from Sara, and 1 if email is from Chris
@@ -85,6 +85,5 @@ X = vectorizer.fit_transform(word_data)
 idf = vectorizer._tfidf.idf_
 print idf
 vocab_list = vectorizer.get_feature_names()
-print vocab_list[34597]
 #print dict(zip(vectorizer.get_feature_names(), idf))
 
