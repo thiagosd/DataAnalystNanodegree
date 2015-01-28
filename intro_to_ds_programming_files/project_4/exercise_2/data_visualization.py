@@ -36,8 +36,8 @@ def plot_weather_data(turnstile_weather):
     about 1/3 of the actual data in the turnstile_weather dataframe.
     '''
 
-    #plot = ggplot(turnstile_weather, aes('EXITSn_hourly', 'ENTRIESn_hourly')) + stat_smooth(span=.15, color='black',
-    #                                                                                        se=True) + geom_point(
+    # plot = ggplot(turnstile_weather, aes('EXITSn_hourly', 'ENTRIESn_hourly')) + stat_smooth(span=.15, color='black',
+    # se=True) + geom_point(
     #    color='lightblue') + ggtitle("MTA Entries By The Hour!") + xlab('Exits') + ylab('Entries')
     #return plot
 
@@ -59,10 +59,12 @@ def plot_weather_data(turnstile_weather):
     # rename Entries column
     hour_and_maxentries = hour_and_maxentries.rename(columns={'sum_ENTRIESn_hourly': 'max_ENTRIESn_hourly'})
 
-    plot2 = ggplot(hour_and_maxentries,
-                   aes('Hour', 'max_ENTRIESn_hourly', color='UNIT')) + geom_point(size=30) + geom_line() + ggtitle(
-        'Stations with more Entries by Hour') + xlab('Hour') + ylab('Max number of Entries') + scale_x_continuous(
-        limits=(-1, 24), breaks=range(0, 24, 1)) + ylim(0, hour_and_maxentries['max_ENTRIESn_hourly'].max() + 10000)
+    plot2 = ggplot(hour_and_maxentries, aes('Hour', 'max_ENTRIESn_hourly', color='UNIT')) + geom_point(
+        size=30) + geom_line() + ggtitle('Stations with more Entries by Hour') + xlab('Hour') + ylab(
+        'Max number of Entries') + scale_x_continuous(limits=(-1, 24), breaks=range(0, 24, 1)) + ylim(0,
+                                                                                                      hour_and_maxentries[
+                                                                                                          'max_ENTRIESn_hourly'].max() + 10000) + geom_text(
+        aes(label='UNIT'), hjust=0.5, vjust=0.5)
     return plot2
 
 
@@ -72,5 +74,6 @@ if __name__ == "__main__":
     turnstile_weather = pd.read_csv("turnstile_data_master_with_weather.csv")
     turnstile_weather['datetime'] = turnstile_weather['DATEn'] + ' ' + turnstile_weather['TIMEn']
     gg = plot_weather_data(turnstile_weather)
-    #ggsave(f, gg)
+    # ggsave(f, gg)
+    print gg
     ggsave(image, gg, width=11, height=8)

@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import scipy
 
+
 def entries_histogram(turnstile_weather):
     '''
     Before we perform any analysis, it might be useful to take a
@@ -26,10 +27,21 @@ def entries_histogram(turnstile_weather):
     You can look at the information contained within the turnstile weather data at the link below:
     https://www.dropbox.com/s/meyki2wl9xfa7yk/turnstile_data_master_with_weather.csv
     '''
+    print turnstile_weather['ENTRIESn_hourly'][turnstile_weather['rain'] == 0].max()
+    print turnstile_weather['ENTRIESn_hourly'][turnstile_weather['rain'] == 1].max()
     plt.figure()
-    turnstile_weather['ENTRIESn_hourly'][turnstile_weather['rain'] == 0].hist(color='b', label='No Rain').legend() # your code here to plot a historgram for hourly entries when it is not raining
-    turnstile_weather['ENTRIESn_hourly'][turnstile_weather['rain'] == 1].hist(color='g', label='Rain').legend() # your code here to plot a historgram for hourly entries when it is raining
-    #plt.show()
+    plt.ylabel('Frequency')
+    plt.xlabel('Hourly Entries')
+    #axes = plt.gca()
+    #axes.set_xlim([0, 25000])
+    # axes.set_ylim([0,80000])
+    turnstile_weather['ENTRIESn_hourly'][turnstile_weather['rain'] == 0].hist(color='b', label='No Rain', bins=20,
+                                                                              range=(0,
+                                                                                     25000)).legend()  # your code here to plot a historgram for hourly entries when it is not raining
+    turnstile_weather['ENTRIESn_hourly'][turnstile_weather['rain'] == 1].hist(color='g', label='Rain', bins=20,
+                                                                              alpha=0.8, range=(
+            0, 25000)).legend()  # your code here to plot a historgram for hourly entries when it is raining
+    plt.show()
     return plt
 
 
@@ -41,4 +53,4 @@ if __name__ == "__main__":
 
 
 
-#http://matplotlib.org/examples/pylab_examples/histogram_demo_extended.html
+    # http://matplotlib.org/examples/pylab_examples/histogram_demo_extended.html
