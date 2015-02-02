@@ -82,6 +82,6 @@ print "average recall: ", sum(recalls)/3.
 
 
 
-#print precision_score( labels_test, pred )
-#print recall_score( labels_test, pred )
+print precision_score( labels_test, pred )
+print recall_score( labels_test, pred )
 
