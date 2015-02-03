@@ -1,0 +1,22 @@
+# initial features
+features_list = ['poi', 'salary']
+GaussianNB()
+	Accuracy: 0.79840	Precision: 0.48095	Recall: 0.10100	F1: 0.16694	F2: 0.11995
+	Total predictions: 10000	True positives:  202	False positives:  218	False negatives: 1798	False negatives: 7782
+----------------------------------------------------------------------
+# all features
+features_list = ['poi', 'salary', 'deferral_payments', 'total_payments', 'loan_advances', 'bonus',
+                 'restricted_stock_deferred', 'deferred_income', 'total_stock_value', 'expenses',
+                 'exercised_stock_options', 'other', 'long_term_incentive', 'restricted_stock', 'director_fees',
+                 'to_messages', 'from_poi_to_this_person', 'from_messages', 'from_this_person_to_poi',
+                 'shared_receipt_with_poi']
+GaussianNB()
+	Accuracy: 0.33260	Precision: 0.14644	Recall: 0.82950	F1: 0.24893	F2: 0.42915
+	Total predictions: 15000	True positives: 1659	False positives: 9670	False negatives:  341	False negatives: 3330
+	--------------------------------------------------------------------------------------------------------------
+
+	Accuracy: 0.80730	Precision: 0.56155	Recall: 0.16650	F1: 0.25685	F2: 0.19376
+	Total predictions: 10000	True positives:  333	False positives:  260	False negatives: 1667	False negatives: 7740
+
+		Accuracy: 0.67170	Precision: 0.21926	Recall: 0.25050	F1: 0.23384	F2: 0.24356
+	Total predictions: 10000	True positives:  501	False positives: 1784	False negatives: 1499	False negatives: 6216

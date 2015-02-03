@@ -4,6 +4,7 @@ import sys
 import pickle
 import matplotlib.pyplot
 
+
 sys.path.append("../tools/")
 
 from feature_format import featureFormat, targetFeatureSplit
@@ -27,7 +28,7 @@ def plt_salary_bonus(data_dict):
 ### Task 1: Select what features you'll use.
 ### features_list is a list of strings, each of which is a feature name.
 ### The first feature must be "poi".
-features_list = ['poi', 'salary']  # You will need to use more features
+features_list = ['poi', 'salary', 'bonus', 'total_payments', 'expenses']
 
 ### Load the dictionary containing the dataset
 data_dict = pickle.load(open("final_project_dataset.pkl", "r"))
@@ -57,10 +58,29 @@ labels, features = targetFeatureSplit(data)
 ### http://scikit-learn.org/stable/modules/pipeline.html
 
 from sklearn.naive_bayes import GaussianNB
+from sklearn.pipeline import Pipeline
+from sklearn.svm import SVC
+from sklearn.decomposition import PCA
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.grid_search import GridSearchCV
 
-clf = GaussianNB()  # Provided to give you a starting point. Try avarietyy of classifiers.
+#clf = GaussianNB()
+clf_gaussian = GaussianNB()
+clf_scv = SVC(kernel='linear', C=1.0, random_state=None) #very slow
+pca = PCA(copy=True, n_components=None, whiten=False)
+clf_tree = DecisionTreeClassifier(random_state=1, min_samples_split=2)
+#clf_ada = AdaBoostClassifier(n_estimators=25, algorithm='SAMME')
+
+estimators = [('reduce_dim', pca), ('tree', clf_tree), ('gauss', clf_gaussian)]
+clf = Pipeline(estimators)
+
 
 ### Task 5: Tune your classifier to achieve better than .3 precision and recall
+
+#params = dict(reduce_dim__n_components=[2, 5, 10])
+#grid_search = GridSearchCV(clf, param_grid=params)
+
 ### using our testing script.
 ### Because of the small size of the dataset, the script uses stratified
 ### shuffle split cross validation. For more info:
