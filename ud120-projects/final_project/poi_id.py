@@ -2,13 +2,22 @@
 
 import sys
 import pickle
+import math
 import matplotlib.pyplot
-
+#from tester import test_classifier, dump_classifier_and_data
+from multi_tester import test_classifier, dump_classifier_and_data
+from sklearn.naive_bayes import GaussianNB
+from sklearn.pipeline import Pipeline
+from sklearn.svm import SVC
+from sklearn.decomposition import PCA
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import AdaBoostClassifier, RandomForestClassifier
+from sklearn.grid_search import GridSearchCV
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 
 sys.path.append("../tools/")
-
 from feature_format import featureFormat, targetFeatureSplit
-from tester import test_classifier, dump_classifier_and_data
+
 
 # begin helper functions
 def plt_salary_bonus(data_dict):
@@ -22,13 +31,16 @@ def plt_salary_bonus(data_dict):
 
     matplotlib.pyplot.xlabel("salary")
     matplotlib.pyplot.ylabel("bonus")
-    matplotlib.pyplot.show()
+    # matplotlib.pyplot.show()
+
+# end helper functions
 
 
 ### Task 1: Select what features you'll use.
 ### features_list is a list of strings, each of which is a feature name.
 ### The first feature must be "poi".
-features_list = ['poi', 'salary', 'bonus', 'total_payments', 'expenses']
+features_list = ['poi', 'salary', 'bonus']
+#, 'total_payments', 'expenses', 'total_stock_value', 'from_oi_to_this_person', 'from_this_person_to_poi'
 
 ### Load the dictionary containing the dataset
 data_dict = pickle.load(open("final_project_dataset.pkl", "r"))
@@ -57,38 +69,59 @@ labels, features = targetFeatureSplit(data)
 ### you'll need to use Pipelines. For more info:
 ### http://scikit-learn.org/stable/modules/pipeline.html
 
-from sklearn.naive_bayes import GaussianNB
-from sklearn.pipeline import Pipeline
-from sklearn.svm import SVC
-from sklearn.decomposition import PCA
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import AdaBoostClassifier
-from sklearn.grid_search import GridSearchCV
+# clf = GaussianNB()
+scaler = StandardScaler()
+min_max_scaler = MinMaxScaler()
 
-#clf = GaussianNB()
+pca = PCA(copy=True, n_components=5, whiten=False)
+
 clf_gaussian = GaussianNB()
-clf_scv = SVC(kernel='linear', C=1.0, random_state=None) #very slow
-pca = PCA(copy=True, n_components=None, whiten=False)
-clf_tree = DecisionTreeClassifier(random_state=1, min_samples_split=2)
-#clf_ada = AdaBoostClassifier(n_estimators=25, algorithm='SAMME')
+clf_svc = SVC(random_state=None)  # very slow
+clf_tree = DecisionTreeClassifier()
+clf_ada = AdaBoostClassifier()
+clf_forest = RandomForestClassifier()
 
-estimators = [('reduce_dim', pca), ('tree', clf_tree), ('gauss', clf_gaussian)]
-clf = Pipeline(estimators)
+estimator_gauss = [('scaler', scaler), ('reduce_dim', pca), ('gauss', clf_gaussian)]
+estimator_tree = [('scaler', scaler), ('reduce_dim', pca), ('tree', clf_tree)]
+estimator_ada = [('scaler', scaler), ('reduce_dim', pca), ('ada', clf_ada)]
+estimator_svc = [('scaler', scaler), ('reduce_dim', pca), ('svc', clf_svc)]
+estimator_forest = [('scaler', scaler), ('reduce_dim', pca), ('forest', clf_forest)]
 
+clf_gaussian = Pipeline(estimator_gauss)
+clf_tree = Pipeline(estimator_tree)
+clf_ada = Pipeline(estimator_ada)
+clf_svc = Pipeline(estimator_svc)
+clf_forest = Pipeline(estimator_forest)
 
 ### Task 5: Tune your classifier to achieve better than .3 precision and recall
 
-#params = dict(reduce_dim__n_components=[2, 5, 10])
-#grid_search = GridSearchCV(clf, param_grid=params)
+params = dict(reduce_dim__n_components=[1, 2], tree__random_state=[0, 1, 2, 3],
+              tree__min_samples_split=[2, 3, 4, 10], )
+clf_tree = GridSearchCV(clf_tree, param_grid=params, n_jobs=-1)
+
+params = dict(reduce_dim__n_components=[1, 2], ada__n_estimators=[10, 25, 50, 75, 100],
+              ada__algorithm=['SAMME', 'SAMME.R'])
+clf_ada = GridSearchCV(clf_ada, param_grid=params, n_jobs=-1)
+
+params = dict(reduce_dim__n_components=[1, 2], svc__kernel=['linear', 'rbf'], svc__C=[1, 10, 100, 1e3, 5e3],
+              svc__gamma=[0.0, 0.0001, 0.0005, 0.001, 0.005, 0.01, 0.1])
+clf_svc = GridSearchCV(clf_svc, param_grid=params, n_jobs=-1)
+
+params = dict(reduce_dim__n_components=[1, 2], forest__n_estimators=[1, 10, 50, 100, 1000],
+              forest__random_state=[None, 1, 2, 5, 10])
+clf_forest = GridSearchCV(clf_forest, param_grid=params, n_jobs=-1)
+
 
 ### using our testing script.
 ### Because of the small size of the dataset, the script uses stratified
 ### shuffle split cross validation. For more info:
 ### http://scikit-learn.org/stable/modules/generated/sklearn.cross_validation.StratifiedShuffleSplit.html
+if __name__ == '__main__':
+    i = 0
+    for clf in [clf_forest, clf_tree, clf_ada, clf_svc]:
+        #test_classifier(clf, my_dataset, features_list)
 
-test_classifier(clf, my_dataset, features_list)
-
-### Dump your classifier, dataset, and features_list so
-### anyone can run/check your results.
-
-dump_classifier_and_data(clf, my_dataset, features_list)
+        ### Dump your classifier, dataset, and features_list so
+        ### anyone can run/check your results.
+        dump_classifier_and_data(clf, my_dataset, features_list, i)
+        i += 1
