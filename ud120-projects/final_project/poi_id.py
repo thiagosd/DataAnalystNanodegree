@@ -4,12 +4,14 @@ import sys
 import pickle
 import math
 import matplotlib.pyplot
-#from tester import test_classifier, dump_classifier_and_data
-from multi_tester import test_classifier, dump_classifier_and_data
+# from tester import test_classifier, dump_classifier_and_data
+#from multi_tester import test_classifier, dump_classifier_and_data
+from tester import test_classifier, dump_classifier_and_data
 from sklearn.naive_bayes import GaussianNB
 from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC
-from sklearn.decomposition import PCA
+#from sklearn.decomposition import PCA
+from sklearn.decomposition import RandomizedPCA
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import AdaBoostClassifier, RandomForestClassifier
 from sklearn.grid_search import GridSearchCV
@@ -33,14 +35,41 @@ def plt_salary_bonus(data_dict):
     matplotlib.pyplot.ylabel("bonus")
     # matplotlib.pyplot.show()
 
+
+def computeFraction(poi_messages, all_messages):
+    """ given a number messages to/from POI (numerator)
+        and number of all messages to/from a person (denominator),
+        return the fraction of messages to/from that person
+        that are from/to a POI
+   """
+    if poi_messages == 'NaN' or all_messages == 'NaN' or poi_messages == 0 or all_messages == 0:
+        fraction = 0.
+    else:
+        fraction = float(poi_messages) / float(all_messages)
+
+    return fraction
+
 # end helper functions
 
 
 ### Task 1: Select what features you'll use.
 ### features_list is a list of strings, each of which is a feature name.
 ### The first feature must be "poi".
-features_list = ['poi', 'salary', 'bonus']
-#, 'total_payments', 'expenses', 'total_stock_value', 'from_oi_to_this_person', 'from_this_person_to_poi'
+features_list = ['poi', 'bonus', 'total_payments', 'expenses', 'fraction_to_poi']
+'''
+1st
+['poi', 'salary', 'bonus', 'total_payments', 'expenses', 'from_poi_to_this_person', 'from_this_person_to_poi', 'fraction_from_poi', 'fraction_to_poi', 'fraction_bonus_to_salary']
+#[ 0.01889231  0.1721201   0.26686628  0.31702631  0.          0.05422794  0.10243056  0.0684365   0.        ]
+#from_poi_to_this_person, fraction_bonus_to_salary
+
+2nd
+[ 0.09828486  0.22634804  0.18747374  0.26882369  0.05422794  0.09640523  0.0684365 ]
+[ 0.0808671   0.28057598  0.26686628  0.25505152  0.          0.04820261  0.0684365 ]
+from_this_person_to_poi
+
+[ 0.06709493  0.22634804  0.26686628  0.26882369  0.04820261  0.12266444]
+salary, fraction_from_poi
+'''
 
 ### Load the dictionary containing the dataset
 data_dict = pickle.load(open("final_project_dataset.pkl", "r"))
@@ -59,8 +88,24 @@ plt_salary_bonus(data_dict)
 ### Store to my_dataset for easy export below.
 my_dataset = data_dict
 
+for name in my_dataset:
+    data_point = my_dataset[name]
+
+    fraction_from_poi = computeFraction(data_point["from_poi_to_this_person"], data_point["to_messages"])
+    data_point["fraction_from_poi"] = fraction_from_poi
+
+    fraction_to_poi = computeFraction(data_point["from_this_person_to_poi"], data_point["to_messages"])
+    data_point["fraction_to_poi"] = fraction_to_poi
+
+    fraction_bonus_to_salary = computeFraction(data_point["salary"], data_point["bonus"])
+    data_point["fraction_bonus_to_salary"] = fraction_to_poi
+
+
+
 ### Extract features and labels from dataset for local testing
 data = featureFormat(my_dataset, features_list)
+#data = data[:len(data)*0.1]
+
 labels, features = targetFeatureSplit(data)
 
 ### Task 4: Try a varity of classifiers
@@ -73,43 +118,25 @@ labels, features = targetFeatureSplit(data)
 scaler = StandardScaler()
 min_max_scaler = MinMaxScaler()
 
-pca = PCA(copy=True, n_components=5, whiten=False)
+#pca = PCA(copy=True, whiten=False)
+pca = RandomizedPCA(copy=True, whiten=False, n_components=6)
 
 clf_gaussian = GaussianNB()
-clf_svc = SVC(random_state=None)  # very slow
-clf_tree = DecisionTreeClassifier()
+clf_tree = DecisionTreeClassifier(min_samples_split=2)
 clf_ada = AdaBoostClassifier()
 clf_forest = RandomForestClassifier()
 
 estimator_gauss = [('scaler', scaler), ('reduce_dim', pca), ('gauss', clf_gaussian)]
-estimator_tree = [('scaler', scaler), ('reduce_dim', pca), ('tree', clf_tree)]
-estimator_ada = [('scaler', scaler), ('reduce_dim', pca), ('ada', clf_ada)]
-estimator_svc = [('scaler', scaler), ('reduce_dim', pca), ('svc', clf_svc)]
-estimator_forest = [('scaler', scaler), ('reduce_dim', pca), ('forest', clf_forest)]
+estimator_tree = [('scaler', scaler), ('tree', clf_tree)]
+
 
 clf_gaussian = Pipeline(estimator_gauss)
 clf_tree = Pipeline(estimator_tree)
-clf_ada = Pipeline(estimator_ada)
-clf_svc = Pipeline(estimator_svc)
-clf_forest = Pipeline(estimator_forest)
 
 ### Task 5: Tune your classifier to achieve better than .3 precision and recall
 
-params = dict(reduce_dim__n_components=[1, 2], tree__random_state=[0, 1, 2, 3],
-              tree__min_samples_split=[2, 3, 4, 10], )
-clf_tree = GridSearchCV(clf_tree, param_grid=params, n_jobs=-1)
-
-params = dict(reduce_dim__n_components=[1, 2], ada__n_estimators=[10, 25, 50, 75, 100],
-              ada__algorithm=['SAMME', 'SAMME.R'])
-clf_ada = GridSearchCV(clf_ada, param_grid=params, n_jobs=-1)
-
-params = dict(reduce_dim__n_components=[1, 2], svc__kernel=['linear', 'rbf'], svc__C=[1, 10, 100, 1e3, 5e3],
-              svc__gamma=[0.0, 0.0001, 0.0005, 0.001, 0.005, 0.01, 0.1])
-clf_svc = GridSearchCV(clf_svc, param_grid=params, n_jobs=-1)
-
-params = dict(reduce_dim__n_components=[1, 2], forest__n_estimators=[1, 10, 50, 100, 1000],
-              forest__random_state=[None, 1, 2, 5, 10])
-clf_forest = GridSearchCV(clf_forest, param_grid=params, n_jobs=-1)
+params = dict(reduce_dim__n_components=[None, 0, 2, 4], tree__random_state=[None, 0, 1, 2, 10, 20, 40])
+#clf_tree = GridSearchCV(clf_tree, param_grid=params, scoring='recall')
 
 
 ### using our testing script.
@@ -117,11 +144,8 @@ clf_forest = GridSearchCV(clf_forest, param_grid=params, n_jobs=-1)
 ### shuffle split cross validation. For more info:
 ### http://scikit-learn.org/stable/modules/generated/sklearn.cross_validation.StratifiedShuffleSplit.html
 if __name__ == '__main__':
-    i = 0
-    for clf in [clf_forest, clf_tree, clf_ada, clf_svc]:
-        #test_classifier(clf, my_dataset, features_list)
+    #test_classifier(clf_tree, my_dataset, features_list)
 
-        ### Dump your classifier, dataset, and features_list so
-        ### anyone can run/check your results.
-        dump_classifier_and_data(clf, my_dataset, features_list, i)
-        i += 1
+    ### Dump your classifier, dataset, and features_list so
+    ### anyone can run/check your results.
+    dump_classifier_and_data(clf_tree, my_dataset, features_list)

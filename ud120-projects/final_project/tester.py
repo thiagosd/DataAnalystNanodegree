@@ -21,7 +21,7 @@ from feature_format import featureFormat, targetFeatureSplit
 PERF_FORMAT_STRING = "\
 \tAccuracy: {:>0.{display_precision}f}\tPrecision: {:>0.{display_precision}f}\t\
 Recall: {:>0.{display_precision}f}\tF1: {:>0.{display_precision}f}\tF2: {:>0.{display_precision}f}"
-RESULTS_FORMAT_STRING = "\tTotal predictions: {:4d}\tTrue positives: {:4d}\tFalse positives: {:4d}\tFalse negatives: {:4d}\tFalse negatives: {:4d}"
+RESULTS_FORMAT_STRING = "\tTotal predictions: {:4d}\tTrue positives: {:4d}\tFalse positives: {:4d}\tFalse negatives: {:4d}\tTrue negatives: {:4d}"
 
 def test_classifier(clf, dataset, feature_list, folds = 1000):
     data = featureFormat(dataset, feature_list)
@@ -45,7 +45,7 @@ def test_classifier(clf, dataset, feature_list, folds = 1000):
         
         ### fit the classifier using training set, and test on test set
         clf.fit(features_train, labels_train)
-        pred = clf.predict(features_test)
+        #pred = clf.predict(features_test)
         predictions = clf.predict(features_test)
         for prediction, truth in zip(predictions, labels_test):
             if prediction == 0 and truth == 0:
@@ -64,12 +64,12 @@ def test_classifier(clf, dataset, feature_list, folds = 1000):
         f1 = 2.0 * true_positives/(2*true_positives + false_positives+false_negatives)
         f2 = (1+2.0*2.0) * precision*recall/(4*precision + recall)
         print clf
-        print clf.best_estimator_
+        #print clf.best_estimator_
         print PERF_FORMAT_STRING.format(accuracy, precision, recall, f1, f2, display_precision = 5)
         print RESULTS_FORMAT_STRING.format(total_predictions, true_positives, false_positives, false_negatives, true_negatives)
         print ""
     except:
-        print "Got a divide by zero when trying out:", name
+        print "Got a divide by zero when trying out:", clf
 
 CLF_PICKLE_FILENAME = "my_classifier.pkl"
 DATASET_PICKLE_FILENAME = "my_dataset.pkl"

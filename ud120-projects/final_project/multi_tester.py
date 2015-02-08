@@ -1,4 +1,5 @@
 #!/usr/bin/pickle
+from time import time
 
 __author__ = 'Thiago'
 
@@ -24,7 +25,7 @@ from feature_format import featureFormat, targetFeatureSplit
 PERF_FORMAT_STRING = "\
 \tAccuracy: {:>0.{display_precision}f}\tPrecision: {:>0.{display_precision}f}\t\
 Recall: {:>0.{display_precision}f}\tF1: {:>0.{display_precision}f}\tF2: {:>0.{display_precision}f}"
-RESULTS_FORMAT_STRING = "\tTotal predictions: {:4d}\tTrue positives: {:4d}\tFalse positives: {:4d}\tFalse negatives: {:4d}\tFalse negatives: {:4d}"
+RESULTS_FORMAT_STRING = "\tTotal predictions: {:4d}\tTrue positives: {:4d}\tFalse positives: {:4d}\tFalse negatives: {:4d}\tTrue negatives: {:4d}"
 
 
 def test_classifier(clf, dataset, feature_list, folds=1000):
@@ -49,8 +50,8 @@ def test_classifier(clf, dataset, feature_list, folds=1000):
 
         ### fit the classifier using training set, and test on test set
         clf.fit(features_train, labels_train)
-        pred = clf.predict(features_test)
         predictions = clf.predict(features_test)
+
         for prediction, truth in zip(predictions, labels_test):
             if prediction == 0 and truth == 0:
                 true_negatives += 1
@@ -67,14 +68,25 @@ def test_classifier(clf, dataset, feature_list, folds=1000):
         recall = 1.0 * true_positives / (true_positives + false_negatives)
         f1 = 2.0 * true_positives / (2 * true_positives + false_positives + false_negatives)
         f2 = (1 + 2.0 * 2.0) * precision * recall / (4 * precision + recall)
+
         print clf
-        print clf.best_estimator_
+        #print "Best Params: ", clf.best_params_
+        #print "Best Estimator: ", clf.best_estimator_
+        #current_classifier = clf.best_estimator_
+        importance = None
+
+        if importance is not None:
+            print "Importance: ", importance
+            imp = sorted(zip(feature_list, importance), key=lambda tup: tup[1], reverse=True)
+            print "Most Important Variables: " + str(imp)
+
+
         print PERF_FORMAT_STRING.format(accuracy, precision, recall, f1, f2, display_precision=5)
         print RESULTS_FORMAT_STRING.format(total_predictions, true_positives, false_positives, false_negatives,
                                            true_negatives)
         print ""
     except:
-        print "Got a divide by zero when trying out:", name
+        print "Got a divide by zero when trying out: ", clf
 
 
 CLF_PICKLE_FILENAME = "my_classifier.pkl"
@@ -98,7 +110,9 @@ def load_classifier_and_data():
             dataset = pickle.load(open(DATASET_PICKLE_FILENAME, "r"))
             feature_list = pickle.load(open(FEATURE_LIST_FILENAME, "r"))
             ### Run testing script
+            t0 = time()
             test_classifier(clf, dataset, feature_list)
+            print "classifier time:", round(time()-t0, 3), "s"
 
 
 def main():
