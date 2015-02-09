@@ -2,20 +2,16 @@
 
 import sys
 import pickle
-import math
+
 import matplotlib.pyplot
+
 # from tester import test_classifier, dump_classifier_and_data
 # from multi_tester import test_classifier, dump_classifier_and_data
 from tester import test_classifier, dump_classifier_and_data
-from sklearn.naive_bayes import GaussianNB
 from sklearn.pipeline import Pipeline
-from sklearn.svm import SVC
-# from sklearn.decomposition import PCA
 from sklearn.decomposition import RandomizedPCA
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import AdaBoostClassifier, RandomForestClassifier
-from sklearn.grid_search import GridSearchCV
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from sklearn.preprocessing import StandardScaler
 
 sys.path.append("../tools/")
 from feature_format import featureFormat, targetFeatureSplit
@@ -26,14 +22,16 @@ def plt_salary_bonus(data_dict):
     """
         plot Salary and Bonus
     """
+
     for point in data_dict:
         salary = data_dict[point]['salary']
         bonus = data_dict[point]['bonus']
-        matplotlib.pyplot.scatter(salary, bonus)
+        matplotlib.pyplot.scatter(salary, bonus, c='red' if data_dict[point]['poi'] else 'green', s=30)
 
     matplotlib.pyplot.xlabel("salary")
     matplotlib.pyplot.ylabel("bonus")
-    # matplotlib.pyplot.show()
+    matplotlib.pyplot.legend()
+    matplotlib.pyplot.show()
 
 
 def computeFraction(poi_messages, all_messages):
@@ -109,7 +107,7 @@ clf = Pipeline(estimator_tree)
 
 #params = dict(reduce_dim__n_components=[1, 2, 3], tree__random_state=[None, 0, 1, 2, 10, 20, 40, 100, 1000],
 #              tree__min_samples_split=[2, 4, 6])
-#clf_tree = GridSearchCV(clf_tree, param_grid=params, n_jobs=-1)
+#clf_tree = GridSearchCV(clf_tree, param_grid=params, n_jobs=-1, scoring='recall')
 
 ### using our testing script.
 ### Because of the small size of the dataset, the script uses stratified

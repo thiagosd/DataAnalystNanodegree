@@ -366,6 +366,7 @@ PCA.inverse_transform(feature_importances_) = [ 0.53803796  0.00427797  0.291116
 
 remove total_payments
 Accuracy: 0.80636	Precision: 0.46875	Recall: 0.48750	F1: 0.47794	F2: 0.48363
+feature importances: [ 0.20919674  0.79080326]
 '''
  now tuning classifier
 
@@ -395,6 +396,7 @@ Pipeline(steps=[('scaler', StandardScaler(copy=True, with_mean=True, with_std=Tr
             random_state=None, splitter='best'))])
 	Accuracy: 0.80500	Precision: 0.46493	Recall: 0.48050	F1: 0.47258	F2: 0.47730
 	Total predictions: 11000	True positives:  961	False positives: 1106	False negatives: 1039	True negatives: 7894
+	explained_variance_ratio_: [ 0.56417799  0.43582201]
 
 2 features / without PCA
 	Pipeline(steps=[('scaler', StandardScaler(copy=True, with_mean=True, with_std=True)), ('tree', DecisionTreeClassifier(compute_importances=None, criterion='gini',
