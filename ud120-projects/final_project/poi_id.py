@@ -5,12 +5,12 @@ import pickle
 import math
 import matplotlib.pyplot
 # from tester import test_classifier, dump_classifier_and_data
-#from multi_tester import test_classifier, dump_classifier_and_data
+# from multi_tester import test_classifier, dump_classifier_and_data
 from tester import test_classifier, dump_classifier_and_data
 from sklearn.naive_bayes import GaussianNB
 from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC
-#from sklearn.decomposition import PCA
+# from sklearn.decomposition import PCA
 from sklearn.decomposition import RandomizedPCA
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import AdaBoostClassifier, RandomForestClassifier
@@ -51,25 +51,10 @@ def computeFraction(poi_messages, all_messages):
 
 # end helper functions
 
-
 ### Task 1: Select what features you'll use.
 ### features_list is a list of strings, each of which is a feature name.
 ### The first feature must be "poi".
-features_list = ['poi', 'bonus', 'total_payments', 'expenses', 'fraction_to_poi']
-'''
-1st
-['poi', 'salary', 'bonus', 'total_payments', 'expenses', 'from_poi_to_this_person', 'from_this_person_to_poi', 'fraction_from_poi', 'fraction_to_poi', 'fraction_bonus_to_salary']
-#[ 0.01889231  0.1721201   0.26686628  0.31702631  0.          0.05422794  0.10243056  0.0684365   0.        ]
-#from_poi_to_this_person, fraction_bonus_to_salary
-
-2nd
-[ 0.09828486  0.22634804  0.18747374  0.26882369  0.05422794  0.09640523  0.0684365 ]
-[ 0.0808671   0.28057598  0.26686628  0.25505152  0.          0.04820261  0.0684365 ]
-from_this_person_to_poi
-
-[ 0.06709493  0.22634804  0.26686628  0.26882369  0.04820261  0.12266444]
-salary, fraction_from_poi
-'''
+features_list = ['poi', 'bonus', 'expenses']
 
 ### Load the dictionary containing the dataset
 data_dict = pickle.load(open("final_project_dataset.pkl", "r"))
@@ -100,12 +85,8 @@ for name in my_dataset:
     fraction_bonus_to_salary = computeFraction(data_point["salary"], data_point["bonus"])
     data_point["fraction_bonus_to_salary"] = fraction_to_poi
 
-
-
 ### Extract features and labels from dataset for local testing
 data = featureFormat(my_dataset, features_list)
-#data = data[:len(data)*0.1]
-
 labels, features = targetFeatureSplit(data)
 
 ### Task 4: Try a varity of classifiers
@@ -113,39 +94,29 @@ labels, features = targetFeatureSplit(data)
 ### Note that if you want to do PCA or other multi-stage operations,
 ### you'll need to use Pipelines. For more info:
 ### http://scikit-learn.org/stable/modules/pipeline.html
-
-# clf = GaussianNB()
 scaler = StandardScaler()
-min_max_scaler = MinMaxScaler()
 
-#pca = PCA(copy=True, whiten=False)
-pca = RandomizedPCA(copy=True, whiten=False, n_components=6)
+pca = RandomizedPCA(copy=True, whiten=False, n_components=2)
 
-clf_gaussian = GaussianNB()
-clf_tree = DecisionTreeClassifier(min_samples_split=2)
-clf_ada = AdaBoostClassifier()
-clf_forest = RandomForestClassifier()
+clf = DecisionTreeClassifier(random_state=10, min_samples_split=2)
 
-estimator_gauss = [('scaler', scaler), ('reduce_dim', pca), ('gauss', clf_gaussian)]
-estimator_tree = [('scaler', scaler), ('tree', clf_tree)]
+estimator_tree = [('scaler', scaler), ('reduce_dim', pca), ('tree', clf)]
 
+clf = Pipeline(estimator_tree)
 
-clf_gaussian = Pipeline(estimator_gauss)
-clf_tree = Pipeline(estimator_tree)
 
 ### Task 5: Tune your classifier to achieve better than .3 precision and recall
 
-params = dict(reduce_dim__n_components=[None, 0, 2, 4], tree__random_state=[None, 0, 1, 2, 10, 20, 40])
-#clf_tree = GridSearchCV(clf_tree, param_grid=params, scoring='recall')
-
+#params = dict(reduce_dim__n_components=[1, 2, 3], tree__random_state=[None, 0, 1, 2, 10, 20, 40, 100, 1000],
+#              tree__min_samples_split=[2, 4, 6])
+#clf_tree = GridSearchCV(clf_tree, param_grid=params, n_jobs=-1)
 
 ### using our testing script.
 ### Because of the small size of the dataset, the script uses stratified
 ### shuffle split cross validation. For more info:
 ### http://scikit-learn.org/stable/modules/generated/sklearn.cross_validation.StratifiedShuffleSplit.html
-if __name__ == '__main__':
-    #test_classifier(clf_tree, my_dataset, features_list)
+test_classifier(clf, my_dataset, features_list)
 
-    ### Dump your classifier, dataset, and features_list so
-    ### anyone can run/check your results.
-    dump_classifier_and_data(clf_tree, my_dataset, features_list)
+### Dump your classifier, dataset, and features_list so
+### anyone can run/check your results.
+dump_classifier_and_data(clf, my_dataset, features_list)

@@ -332,3 +332,102 @@ with all data = Accuracy: 0.78493	Precision: 0.27054	Recall: 0.29800	F1: 0.28361
 Accuracy: 0.78343	Precision: 0.26067	Recall: 0.28100	F1: 0.27045	F2: 0.27668
 ['salary',    'bonus',      'total_payments', 'expenses',   'from_poi_to_this_person', 'from_this_person_to_poi', 'fraction_from_poi', 'fraction_to_poi', 'fraction_bonus_to_salary']
 [ 0.0859543   0.06446843    -0.10915393         0.18586154  0.21697156                  0.11096233                  0.29734185          0.19936043          0.19936043]
+
+--------------------------------------------------------------------------
+sunday night
+'''
+1st
+['poi', 'salary', 'bonus', 'total_payments', 'expenses', 'from_poi_to_this_person', 'from_this_person_to_poi', 'fraction_from_poi', 'fraction_to_poi', 'fraction_bonus_to_salary']
+#[ 0.01889231  0.1721201   0.26686628  0.31702631  0.          0.05422794  0.10243056  0.0684365   0.        ]
+#from_poi_to_this_person, fraction_bonus_to_salary
+
+2nd
+[ 0.09828486  0.22634804  0.18747374  0.26882369  0.05422794  0.09640523  0.0684365 ]
+[ 0.0808671   0.28057598  0.26686628  0.25505152  0.          0.04820261  0.0684365 ]
+from_this_person_to_poi
+
+3rd
+[ 0.06709493  0.22634804  0.26686628  0.26882369  0.04820261  0.12266444]
+salary, fraction_from_poi
+
+4th
+[ 0.22915109  0.36526456  0.40558435  0.        ]
+'fraction_to_poi'
+
+5th - final
+features: 'bonus', 'total_payments', 'expenses'
+importance: [ 0.21759477  0.37769444  0.40471079]
+without PCA  - Accuracy: 0.79885	Precision: 0.35195	Recall: 0.36550	F1: 0.35860	F2: 0.36271
+features importances: [ 0.21759477  0.4385497   0.34385553]
+
+with PCA - Accuracy: 0.82069	Precision: 0.41811	Recall: 0.42250	F1: 0.42029	F2: 0.42161
+feature_importances_: [ 0.45609379  0.17626292  0.36764328]
+PCA.inverse_transform(feature_importances_) = [ 0.53803796  0.00427797  0.29111612]
+
+remove total_payments
+Accuracy: 0.80636	Precision: 0.46875	Recall: 0.48750	F1: 0.47794	F2: 0.48363
+'''
+ now tuning classifier
+
+PCA n_components=3 / 3 features
+Pipeline(steps=[('scaler', StandardScaler(copy=True, with_mean=True, with_std=True)), ('reduce_dim', RandomizedPCA(copy=True, iterated_power=3, n_components=3, random_state=None,
+       whiten=False)), ('tree', DecisionTreeClassifier(compute_importances=None, criterion='gini',
+            max_depth=None, max_features=None, max_leaf_nodes=None,
+            min_density=None, min_samples_leaf=1, min_samples_split=2,
+            random_state=None, splitter='best'))])
+	Accuracy: 0.82162	Precision: 0.42170	Recall: 0.42950	F1: 0.42556	F2: 0.42792
+	Total predictions: 13000	True positives:  859	False positives: 1178	False negatives: 1141	True negatives: 9822
+
+PCA n_components=2 / 3 features
+Pipeline(steps=[('scaler', StandardScaler(copy=True, with_mean=True, with_std=True)), ('reduce_dim', RandomizedPCA(copy=True, iterated_power=3, n_components=2, random_state=None,
+       whiten=False)), ('tree', DecisionTreeClassifier(compute_importances=None, criterion='gini',
+            max_depth=None, max_features=None, max_leaf_nodes=None,
+            min_density=None, min_samples_leaf=1, min_samples_split=2,
+            random_state=None, splitter='best'))])
+	Accuracy: 0.78323	Precision: 0.30616	Recall: 0.32300	F1: 0.31436	F2: 0.31949
+	Total predictions: 13000	True positives:  646	False positives: 1464	False negatives: 1354	True negatives: 9536
+
+* PCA n_components=2 / 2 features
+	Pipeline(steps=[('scaler', StandardScaler(copy=True, with_mean=True, with_std=True)), ('reduce_dim', RandomizedPCA(copy=True, iterated_power=3, n_components=2, random_state=None,
+       whiten=False)), ('tree', DecisionTreeClassifier(compute_importances=None, criterion='gini',
+            max_depth=None, max_features=None, max_leaf_nodes=None,
+            min_density=None, min_samples_leaf=1, min_samples_split=2,
+            random_state=None, splitter='best'))])
+	Accuracy: 0.80500	Precision: 0.46493	Recall: 0.48050	F1: 0.47258	F2: 0.47730
+	Total predictions: 11000	True positives:  961	False positives: 1106	False negatives: 1039	True negatives: 7894
+
+2 features / without PCA
+	Pipeline(steps=[('scaler', StandardScaler(copy=True, with_mean=True, with_std=True)), ('tree', DecisionTreeClassifier(compute_importances=None, criterion='gini',
+            max_depth=None, max_features=None, max_leaf_nodes=None,
+            min_density=None, min_samples_leaf=1, min_samples_split=2,
+            random_state=None, splitter='best'))])
+	Accuracy: 0.77573	Precision: 0.39599	Recall: 0.44450	F1: 0.41885	F2: 0.43387
+	Total predictions: 11000	True positives:  889	False positives: 1356	False negatives: 1111	True negatives: 7644
+
+PCA n_components=1 / 2 features
+Pipeline(steps=[('scaler', StandardScaler(copy=True, with_mean=True, with_std=True)), ('reduce_dim', RandomizedPCA(copy=True, iterated_power=3, n_components=1, random_state=None,
+       whiten=False)), ('tree', DecisionTreeClassifier(compute_importances=None, criterion='gini',
+            max_depth=None, max_features=None, max_leaf_nodes=None,
+            min_density=None, min_samples_leaf=1, min_samples_split=2,
+            random_state=None, splitter='best'))])
+	Accuracy: 0.76518	Precision: 0.32883	Recall: 0.28000	F1: 0.30246	F2: 0.28857
+	Total predictions: 11000	True positives:  560	False positives: 1143	False negatives: 1440	True negatives: 7857
+
+SET on PCA n_components=2 / 2 features, moving to DecisionTree Classifier tuning
+	random_state = None = Accuracy: 0.80727	Precision: 0.47050	Recall: 0.47850	F1: 0.47447	F2: 0.47688
+	random_state = 0 = Accuracy: 0.80555	Precision: 0.46520	Recall: 0.46450	F1: 0.46485	F2: 0.46464
+	random_state = 1 = Accuracy: 0.80818	Precision: 0.47301	Recall: 0.48200	F1: 0.47746	F2: 0.48018
+	random_state = 2 = Accuracy: 0.80782	Precision: 0.47198	Recall: 0.48000	F1: 0.47595	F2: 0.47837
+	*random_state = 10 = Accuracy: 0.81018	Precision: 0.47852	Recall: 0.49000	F1: 0.48419	F2: 0.48766
+	random_state = 20 = Accuracy: 0.80536	Precision: 0.46532	Recall: 0.47300	F1: 0.46913	F2: 0.47144
+	random_state = 40 = Accuracy: 0.80636	Precision: 0.46829	Recall: 0.48000	F1: 0.47407	F2: 0.47761
+	random_state = 100 = Accuracy: 0.80727	Precision: 0.47115	Recall: 0.49000	F1: 0.48039	F2: 0.48611
+	random_state = 1000 = Accuracy: 0.81064	Precision: 0.47998	Recall: 0.49750	F1: 0.48858	F2: 0.49389
+
+	*min_samples_split = 2 = Accuracy: 0.80982	Precision: 0.47760	Recall: 0.49050	F1: 0.48397	F2: 0.48787
+	min_samples_split = 4 = Accuracy: 0.81055	Precision: 0.47808	Recall: 0.45800	F1: 0.46782	F2: 0.46188
+	min_samples_split = 6 = Accuracy: 0.80273	Precision: 0.45677	Recall: 0.44900	F1: 0.45285	F2: 0.45053
+
+
+	all numbers above were taken with StandardScaler scaler. with MinMaxScaler, numbers are:
+	Accuracy: 0.76527	Precision: 0.37337	Recall: 0.42900	F1: 0.39926	F2: 0.41659
