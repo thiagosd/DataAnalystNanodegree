@@ -5,8 +5,8 @@ import pickle
 
 import matplotlib.pyplot
 
-# from tester import test_classifier, dump_classifier_and_data
 # from multi_tester import test_classifier, dump_classifier_and_data
+#from sklearn.grid_search import GridSearchCV
 from tester import test_classifier, dump_classifier_and_data
 from sklearn.pipeline import Pipeline
 from sklearn.decomposition import RandomizedPCA
