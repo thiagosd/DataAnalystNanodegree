@@ -6,7 +6,7 @@ import pickle
 import matplotlib.pyplot
 
 # from multi_tester import test_classifier, dump_classifier_and_data
-#from sklearn.grid_search import GridSearchCV
+# from sklearn.grid_search import GridSearchCV
 from tester import test_classifier, dump_classifier_and_data
 from sklearn.pipeline import Pipeline
 from sklearn.decomposition import RandomizedPCA
@@ -26,10 +26,15 @@ def plt_salary_bonus(data_dict):
     for point in data_dict:
         salary = data_dict[point]['salary']
         bonus = data_dict[point]['bonus']
-        matplotlib.pyplot.scatter(salary, bonus, c='red' if data_dict[point]['poi'] else 'green', s=30)
-
-    matplotlib.pyplot.xlabel("salary")
-    matplotlib.pyplot.ylabel("bonus")
+        matplotlib.pyplot.scatter(salary, bonus, c='red' if data_dict[point]['poi'] else 'green', s=40)
+        if point == 'TOTAL':
+            matplotlib.pyplot.annotate('"Total" Outlier', xy=(salary, bonus),  xytext=(-20, 20), textcoords='offset points', ha='right', va='bottom',
+                                       bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
+                                       arrowprops=dict(arrowstyle='->', connectionstyle='arc3,rad=0'))
+    matplotlib.pyplot.xlabel("Salary")
+    matplotlib.pyplot.ylabel("Bonus")
+    #matplotlib.pyplot.scatter(0, 0, c='red', s=40, label='POI')
+    #matplotlib.pyplot.scatter(0, 0, c='green', s=40, label='Non-POI')
     matplotlib.pyplot.legend()
     matplotlib.pyplot.show()
 
