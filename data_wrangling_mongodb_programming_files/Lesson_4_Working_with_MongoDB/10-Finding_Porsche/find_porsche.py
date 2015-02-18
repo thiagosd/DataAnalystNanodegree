@@ -22,17 +22,21 @@ def get_db(db_name):
 
 def porsche_query():
     # Please fill in the query to find all autos manuafactured by Porsche
-    query = {}
+    query = {"manufacturer": "http://dbpedia.org/resource/Porsche"}
     return query
 
 
 def find_porsche(db, query):
+    #projections = {"_id": 0, "name": 1}
+    #return db.autos.find(query, projections)
     return db.autos.find(query)
 
 
 if __name__ == "__main__":
 
-    db = get_db('examples')
+    db = get_db('NanoDegree')
     query = porsche_query()
     p = find_porsche(db, query)
     import pprint
+    for doc in p:
+        pprint.pprint(doc)
