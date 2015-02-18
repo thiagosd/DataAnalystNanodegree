@@ -7,7 +7,7 @@ If you look at the full city data, you will notice that there are couple of valu
 the same information in different formats: "point" seems to be the combination of "wgs84_pos#lat" and "wgs84_pos#long".
 However we do not know if that is the case and should check if they are equivalent.
 
-Finish the function check_loc(). It will recieve 3 strings, first will be the combined value of "point" and then the
+Finish the function check_loc(). It will receive 3 strings, first will be the combined value of "point" and then the
 "wgs84_pos#" values separately. You have to extract the lat and long values from the "point" and compare
 to the "wgs84_pos# values and return True or False.
 
@@ -25,8 +25,14 @@ CITIES = 'cities.csv'
 
 def check_loc(point, lat, longi):
     # YOUR CODE HERE
-    
-    pass
+    points = point.split(' ')
+    pointLat = points[0]
+    pointLon = points[1]
+
+    if (pointLat == lat) & (pointLon == longi):
+        return True
+    else:
+        return False
 
 
 def process_file(filename):

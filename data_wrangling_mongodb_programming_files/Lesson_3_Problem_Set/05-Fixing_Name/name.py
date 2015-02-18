@@ -7,8 +7,8 @@ In the previous quiz you recognized that the "name" value can be an array (or li
 It would make it easier to process and query the data later, if all values for the name 
 would be in a Python list, instead of being just a string separated with special characters, like now.
 
-Finish the function fix_name(). It will recieve a string as an input, and it has to return a list
-of all the names. If there is only one name, the list with have only one item in it, if the name is "NONE",
+Finish the function fix_name(). It will receive a string as an input, and it has to return a list
+of all the names. If there is only one name, the list with have only one item in it, if the name is "NULL",
 the list should be empty.
 The rest of the code is just an example on how this function can be used
 """
@@ -22,6 +22,17 @@ CITIES = 'cities.csv'
 def fix_name(name):
 
     # YOUR CODE HERE
+    if name == 'NULL':
+        name = []
+        return name
+
+    name = name.strip('{}')
+    names = name.split('|')
+
+    if len(names) > 1:
+        name = [names[0], names[1]]
+    else:
+        name = [names[0]]
 
     return name
 

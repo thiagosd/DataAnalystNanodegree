@@ -20,12 +20,24 @@ import pprint
 CITIES = 'cities.csv'
 
 
-def fix_area(area):
+def define_area(area):
+    area = area.strip('{}')
+    areas = area.split('|')
 
-    # YOUR CODE HERE
-
+    if len(areas) > 1:
+        area = float(areas[0]) if len(areas[0]) >= len(areas[1]) else float(areas[1])
+    else:
+        area = float(areas[0])
     return area
 
+
+def fix_area(area):
+    # YOUR CODE HERE
+    if area == "NULL":
+        area = None
+    else:
+        area = define_area(area)
+    return area
 
 
 def process_file(filename):
@@ -35,7 +47,7 @@ def process_file(filename):
     with open(filename, "r") as f:
         reader = csv.DictReader(f)
 
-        #skipping the extra matadata
+        # skipping the extra matadata
         for i in range(3):
             l = reader.next()
 
@@ -53,7 +65,7 @@ def test():
     data = process_file(CITIES)
 
     print "Printing three example results:"
-    for n in range(5,8):
+    for n in range(5, 8):
         pprint.pprint(data[n]["areaLand"])
 
     assert data[8]["areaLand"] == 55166700.0
