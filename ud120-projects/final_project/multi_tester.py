@@ -74,7 +74,7 @@ def test_classifier(clf, dataset, feature_list, folds=1000):
         #print "Best Estimator: ", clf.best_estimator_
         #current_classifier = clf.best_estimator_
         importance = None
-        dd = []
+
 
         if importance is not None:
             print "Importance: ", importance
