@@ -49,6 +49,7 @@ pred = reg.predict(feature_test)
 print reg.coef_  # slope
 print reg.intercept_
 print reg.score(feature_test, target_test)
+print pred
 
 
 
