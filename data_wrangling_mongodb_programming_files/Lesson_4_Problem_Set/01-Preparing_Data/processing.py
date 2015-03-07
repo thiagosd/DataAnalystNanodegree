@@ -14,7 +14,8 @@ The following things should be done:
 - if a value of a field is "NULL", convert it to None
 - if there is a value in 'synonym', it should be converted to an array (list)
   by stripping the "{}" characters and splitting the string on "|". Rest of the cleanup is up to you,
-  eg removing "*" prefixes etc
+  eg removing "*" prefixes etc. If there is a singular synonym, the value should still be formatted
+  in a list.
 - strip leading and ending whitespace from all fields, if there is any
 - the output structure should be as follows:
 { 'label': 'Argiope',
@@ -31,6 +32,8 @@ The following things should be done:
                     'genus': None
                     }
 }
+  * Note that the value associated with the classification key is a dictionary with
+    taxonomic labels.
 """
 import codecs
 import csv
@@ -56,13 +59,46 @@ def process_file(filename, fields):
 
     process_fields = fields.keys()
     data = []
+    classification_list = ['family', 'class', 'phylum', 'order', 'kingdom', 'genus']
+
     with open(filename, "r") as f:
         reader = csv.DictReader(f)
         for i in range(3):
             l = reader.next()
 
         for line in reader:
-            # YOUR CODE HERE
+            updated_dict = {'classification': {}}
+
+            for field in fields:
+
+                # strip whitespace
+                updated_value = line[field].strip()
+
+                # if a value of a field is "NULL", convert it to None
+                if line[field] == 'NULL':
+                    updated_value = None
+
+                # trim out redundant description in parenthesis from the 'rdf-schema#label' field, like "(spider)"
+                if fields[field] == 'label':
+                    print line[field]
+                    updated_value = re.sub(r'\([^)]*\)', '', line[field]).strip()
+
+                # if 'name' is "NULL" or contains non-alphanumeric characters, set it to the same value as 'label'
+                if fields[field] == 'name' and (line[field] == 'NULL' or re.search('[\W-]+', line[field]) is not None):
+                    updated_value = line['rdf-schema#label'].strip()
+
+                # if there is a value in 'synonym',
+                # it should be converted to an array (list) by stripping the "{}" characters
+                # and splitting the string on "|"
+                if fields[field] == 'synonym' and line[field] != 'NULL':
+                    updated_value = [i.strip("{}") for i in line[field].split('|')]
+
+                if fields[field] in classification_list:
+                    updated_dict['classification'][fields[field]] = updated_value
+                else:
+                    updated_dict[fields[field]] = updated_value
+
+            data.append(updated_dict)
             pass
     return data
 

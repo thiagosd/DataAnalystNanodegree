@@ -41,27 +41,42 @@ import codecs
 import csv
 import json
 import pprint
+import re
+import pymongo
 
 DATAFILE = 'arachnid.csv'
-FIELDS ={'rdf-schema#label': 'label',
-         'binomialAuthority_label': 'binomialAuthority'}
+FIELDS = {'rdf-schema#label': 'label',
+          'binomialAuthority_label': 'binomialAuthority'}
 
 
 def add_field(filename, fields):
-
     process_fields = fields.keys()
-    data = {}
+    data = []
     with open(filename, "r") as f:
         reader = csv.DictReader(f)
         for i in range(3):
             l = reader.next()
         # YOUR CODE HERE
+        for line in reader:
+            line['rdf-schema#label'] = re.sub(r'\([^)]*\)', '', line['rdf-schema#label']).strip()
+
+            if line['binomialAuthority_label'] == "NULL":
+                continue
+            else:
+                d = {"label": line['rdf-schema#label'],
+                     "classification": {
+                         "binomialAuthority": line['binomialAuthority_label']}}
+                data.append(d)
 
     return data
 
 
 def update_db(data, db):
     # YOUR CODE HERE
+    for record in data:
+        updated_record = db.arachnid.find_one({'label': record['label']})
+        updated_record['classification']['binomialAuthority'] = record['classification']['binomialAuthority']
+        db.arachnid.save(updated_record)
     pass
 
 
@@ -70,9 +85,10 @@ def test():
     # Changes done to this function will not be taken into account
     # when doing a Test Run or Submit, they are just for your own reference
     # and as an example for running this code locally!
-    
+
     data = add_field(DATAFILE, FIELDS)
     from pymongo import MongoClient
+
     client = MongoClient("mongodb://localhost:27017")
     db = client.examples
 
@@ -81,7 +97,6 @@ def test():
     updated = db.arachnid.find_one({'label': 'Opisthoncana'})
     assert updated['classification']['binomialAuthority'] == 'Embrik Strand'
     pprint.pprint(data)
-
 
 
 if __name__ == "__main__":
