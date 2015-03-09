@@ -98,37 +98,51 @@ def shape_element(element):
     # - you should process only 2 types of top level tags: "node" and "way"
     if element.tag == "node" or element.tag == "way":
         # YOUR CODE HERE
-        # - all attributes of "node" and "way" should be turned into regular key/value pairs
-        node['id'] = element.attrib['id']
-        node['type'] = element.tag
-        if 'visible' in element.attrib:
-            node['visible'] = element.attrib['visible']
+        for element_key in element.attrib.keys():
+            element_val = element.attrib[element_key]
+            # - all attributes of "node" and "way" should be turned into regular key/value pairs
+            node["type"] = element.tag
+            node['id'] = element.attrib['id']
 
-        # - attributes in the CREATED array should be added under a key "created"
-        node['created'] = {}
-        for created_attr in CREATED:
-            node['created'][created_attr] = element.attrib[created_attr]
+            # - attributes in the CREATED array should be added under a key "created"
+            if element_key in CREATED:
+                if "created" not in node.keys():
+                    node["created"] = {}
+                node["created"][element_key] = element_val
+            # - attributes for latitude and longitude should be added to a "pos" array,
+            if element_key in ['lat', 'lon']:
+                if "pos" not in node.keys():
+                    node["pos"] = [0.0, 0.0]
+                if element_key == "lat":
+                    node["pos"][0] = float(element_val)
+                else:
+                    node["pos"][1] = float(element_val)
+            # all attributes of "node" and "way" should be turned into regular key/value pairs
+            else:
+                node[element_key] = element_val
 
-        # - attributes for latitude and longitude should be added to a "pos" array,
-        if 'lat' and 'lon' in element.attrib:
-            node['pos'] = [float(element.attrib['lat']), float(element.attrib['lon'])]
 
-        # second level tag "k" values
-        for tag in element.iterfind("tag"):
-            key = tag.attrib['k']
-            value = tag.attrib['v']
-            # - if second level tag "k" value contains problematic characters, it should be ignored
-            if not problemchars.search(key):
-                # - if second level tag "k" value starts with "addr:", it should be added to a dictionary "address"
-                # - if there is a second ":" that separates the type/direction of a street, the tag should be ignored
-                if key.startswith("addr:") and lower_colon.match(key):
-                    if 'address' not in node:
-                        node['address'] = {}
-                    node['address'][key.split(":")[1]] = value
-                # - if second level tag "k" value does not start with "addr:",
-                # but contains ":", you can process it same as any other tag.
-                elif lower_colon.search(key) and not key.startswith("addr:"):
-                    node[key] = value
+            # second level tag "k" values
+            for tag in element.iterfind("tag"):
+                tag_key = tag.attrib['k']
+                tag_value = tag.attrib['v']
+                # - if second level tag "k" value contains problematic characters, it should be ignored
+                if not problemchars.search(tag_key):
+                    # - if second level tag "k" value starts with "addr:", it should be added to a dictionary "address"
+                    # - if there is a second ":" that separates the type/direction of a street, the tag should be ignored
+                    if tag_key.startswith("addr:"):
+                        if 'address' not in node:
+                            node['address'] = {}
+                        if tag_key == "addr:postcode":
+                            node['address'][tag_key.split(":")[1]] = re.findall('\d+', tag_value)[:5]
+                        else:
+                            node['address'][tag_key.split(":")[1]] = tag_value
+                    # - if second level tag "k" value does not start with "addr:",
+                    # but contains ":", you can process it same as any other tag.
+                    elif lower_colon.search(tag_key) and not tag_key.startswith("addr:"):
+                        node[tag_key] = tag_value
+                    else:
+                        node[tag_key] = tag_value
 
         # "way" should be turned into node_refs
         for nd in element.iterfind("nd"):
@@ -143,6 +157,7 @@ def shape_element(element):
 
 def process_map(file_in, pretty=False):
     # You do not need to change this file
+
     file_out = "{0}.json".format(file_in)
     data = []
     with codecs.open(file_out, "w") as fo:
@@ -161,31 +176,8 @@ def test():
     # NOTE: if you are running this code on your computer, with a larger dataset,
     # call the process_map procedure with pretty=False. The pretty=True option adds
     # additional spaces to the output, making it significantly larger.
-    data = process_map('miami_florida.osm', True)
-    #pprint.pprint(data)
-    '''
-    correct_first_elem = {
-        "id": "261114295",
-        "visible": "true",
-        "type": "node",
-        "pos": [41.9730791, -87.6866303],
-        "created": {
-            "changeset": "11129782",
-            "user": "bbmiller",
-            "version": "7",
-            "uid": "451048",
-            "timestamp": "2012-03-28T18:31:23Z"
-        }
-    }
-    assert data[0] == correct_first_elem
-    assert data[-1]["address"] == {
-        "street": "West Lexington St.",
-        "housenumber": "1412"
-    }
-    assert data[-1]["node_refs"] == ["2199822281", "2199822390", "2199822392", "2199822369",
-                                     "2199822370", "2199822284", "2199822281"]
-    '''
-
+    data = process_map('miami_florida.osm', False)
+    # pprint.pprint(data)
 
 if __name__ == "__main__":
     test()

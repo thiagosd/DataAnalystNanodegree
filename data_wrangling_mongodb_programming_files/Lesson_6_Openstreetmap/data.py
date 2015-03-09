@@ -129,6 +129,8 @@ def shape_element(element):
                 # but contains ":", you can process it same as any other tag.
                 elif lower_colon.search(key) and not key.startswith("addr:"):
                     node[key] = value
+                else:
+                    node[key] = value
 
         # "way" should be turned into node_refs
         for nd in element.iterfind("nd"):
