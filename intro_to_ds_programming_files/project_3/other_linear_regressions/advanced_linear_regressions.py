@@ -85,6 +85,7 @@ def predictions(weather_turnstile):
             + Hour + I(Hour ** 2.0) + I(Hour ** 3.0)",
         data=weather_turnstile)
     results = model.fit()
+    print results.summary()
 
     '''
     # plot residuals

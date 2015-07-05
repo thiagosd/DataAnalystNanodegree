@@ -28,13 +28,14 @@ def plt_salary_bonus(data_dict):
         bonus = data_dict[point]['bonus']
         matplotlib.pyplot.scatter(salary, bonus, c='red' if data_dict[point]['poi'] else 'green', s=40)
         if point == 'TOTAL':
-            matplotlib.pyplot.annotate('"Total" Outlier', xy=(salary, bonus),  xytext=(-20, 20), textcoords='offset points', ha='right', va='bottom',
+            matplotlib.pyplot.annotate('"Total" Outlier', xy=(salary, bonus), xytext=(-20, 20),
+                                       textcoords='offset points', ha='right', va='bottom',
                                        bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
                                        arrowprops=dict(arrowstyle='->', connectionstyle='arc3,rad=0'))
     matplotlib.pyplot.xlabel("Salary")
     matplotlib.pyplot.ylabel("Bonus")
-    #matplotlib.pyplot.scatter(0, 0, c='red', s=40, label='POI')
-    #matplotlib.pyplot.scatter(0, 0, c='green', s=40, label='Non-POI')
+    # matplotlib.pyplot.scatter(0, 0, c='red', s=40, label='POI')
+    # matplotlib.pyplot.scatter(0, 0, c='green', s=40, label='Non-POI')
     matplotlib.pyplot.legend()
     matplotlib.pyplot.show()
 
@@ -110,9 +111,9 @@ clf = Pipeline(estimator_tree)
 
 ### Task 5: Tune your classifier to achieve better than .3 precision and recall
 
-#params = dict(reduce_dim__n_components=[1, 2, 3], tree__random_state=[None, 0, 1, 2, 10, 20, 40, 100, 1000],
+# params = dict(reduce_dim__n_components=[1, 2, 3], tree__random_state=[None, 0, 1, 2, 10, 20, 40, 100, 1000],
 #              tree__min_samples_split=[2, 4, 6])
-#clf_tree = GridSearchCV(clf_tree, param_grid=params, n_jobs=-1, scoring='recall')
+# clf_tree = GridSearchCV(clf_tree, param_grid=params, n_jobs=-1, scoring='recall')
 
 ### using our testing script.
 ### Because of the small size of the dataset, the script uses stratified
